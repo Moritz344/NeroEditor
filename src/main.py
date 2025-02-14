@@ -7,9 +7,9 @@ class App(ctk.CTk):
         super().__init__()
         ctk.set_appearance_mode("dark")
         self.geometry("1000x600")
+        self.minsize(1000,600)
         self.title("Text Editor")
         
-        menu_func(self)
         Widgets(self)
 
         self.mainloop()
