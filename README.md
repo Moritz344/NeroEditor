@@ -1,4 +1,6 @@
 # TextEditor
+[![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
+
 simple text editor written in python.
 
 # Screenshot
@@ -16,6 +18,15 @@ simple text editor written in python.
 - save text file
 - change font
 - change font size
+
+# Usage
+```bash
+git clone https://github.com/Moritz344/TextEditor.git
+cd TextEditor
+cd src
+python3 main.py
+
+```
 
 # Author
 - Moritz344
