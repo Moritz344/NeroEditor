@@ -18,6 +18,8 @@ simple text editor written in python.
 - save text file
 - change font
 - change font size
+- change colorscheme
+- change dark/light mode
 
 # Usage
 ```bash
