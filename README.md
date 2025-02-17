@@ -1,12 +1,12 @@
-# TextEditor
+# NoteEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
-simple text editor written in python.
+edit text.
 
 # Screenshot
 </details>
 <details>
-<summary>Screenshot TextEditor</summary>
+<summary>Screenshot</summary>
 
 ![Screenshot_68](https://github.com/user-attachments/assets/d7cd9dc1-99b8-4ffa-b801-4484808fe05a)
 
@@ -14,10 +14,13 @@ simple text editor written in python.
 </details>
 
 # Features
-- open text files
-- save text file
+- open text files,python files
+- save text file,pytho files
 - change font
 - change font size
+- change colorscheme
+- change dark/light mode
+
 
 # Usage
 ```bash
