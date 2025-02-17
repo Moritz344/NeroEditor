@@ -2,27 +2,57 @@ import customtkinter as ctk
 from tkinter import *
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import simpledialog
 import sys
 from CTkListbox import *
+from settings import *
+
+
+# Start Screen?
+
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
         
         self.font = "Arial"
-        self.font_size = 25
-        self.max_font_size = 50
-        self.min_font_size = 25
+        self.font_size = standard_font_size
+        self.max_font_size = max_font_size
+        self.min_font_size = min_font_size
         self.text_color = "white"
-        self.fg_color = "#171614"
+        self.fg_color = background_color
         self.create_textbox(window)
         self.menu_func(window)
+
+        self.path = path
         
+        self.file_name(window,self.path)
+        # self.rename_file(window)
+
         # gedrückte tasten
         self.pressed_keys = set()
         
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
+
+    def file_name(self,window,path):
+        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#007090",hover_color="#01a7c2")
+        self.file_btn.place(x=0,y=0)
+
+    def rename_file(self,window):
+        # frägt beim starten der app nach einem namen für eine datei
+        new_name = simpledialog.askstring("Rename","Enter a new file name: ")
+
+        if new_name:
+            self.update_file_name(new_name)
+
+
+    def update_file_name(self,path):
+        self.path = path
+        # als ob das funktioniert hat
+        path = self.path.split("/")
+        self.file_btn.configure(text=path[-1])
+        
         
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
@@ -46,7 +76,7 @@ class Widgets(ctk.CTkFrame):
 
     def create_textbox(self,window):
         self.textbox = ctk.CTkTextbox(window,width=1920,height=1080,corner_radius=0,text_color=self.text_color,fg_color=self.fg_color,font=(self.font,self.font_size))
-        self.textbox.place(x=0,y=0)
+        self.textbox.place(x=0,y=28)
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
@@ -56,12 +86,12 @@ class Widgets(ctk.CTkFrame):
             def open_file():
                 try:
                  # file path
-                 path = filedialog.askopenfile(title="Open File",filetypes=[("Textdateien","*.txt",),("Python-Dateien","*.py")],).name
+                 self.path = filedialog.askopenfile(title="Open File",filetypes=[("Textdateien","*.txt",),("Python-Dateien","*.py")],).name
                 
-                 if path:
-                     with open(path,"r",encoding="utf-8") as file:
+                 if self.path:
+                     self.update_file_name(self.path)
+                     with open(self.path,"r",encoding="utf-8") as file:
                          content = file.read()
-
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                 except Exception as e:
@@ -69,10 +99,11 @@ class Widgets(ctk.CTkFrame):
                 
             def save_file():
                 try:
-                    path = filedialog.asksaveasfile(title="Save File",filetypes=[("Textdateien","*.txt"),("Python-Dateien","*.py")]).name
+                    self.path = filedialog.asksaveasfile(title="Save File",filetypes=[("Textdateien","*.txt"),("Python-Dateien","*.py")]).name
                 
-                    if path:
-                        with open(path,"w",encoding="utf-8") as file:
+                    if self.path:
+                        self.update_file_name(self.path)
+                        with open(self.path,"w",encoding="utf-8") as file:
                             content = self.textbox.get(1.0,tk.END) # holt den text aus dem editor
                             file.write(content) # speichert den text in die datei
 
@@ -174,7 +205,8 @@ github @Moritz344 or if you need any help."""
                 self.update_textbox_font()
 
             menu = Menu(master)
-            master.config(menu=menu)
+            master.configure(menu=menu)
+
     
             fileMenu = Menu(menu,tearoff=False)
             helpMenu = Menu(menu,tearoff=False)
