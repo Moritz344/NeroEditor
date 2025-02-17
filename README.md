@@ -6,7 +6,7 @@ edit text.
 # Screenshot
 </details>
 <details>
-<summary>Screenshot TextEditor</summary>
+<summary>Screenshot</summary>
 
 ![Screenshot_68](https://github.com/user-attachments/assets/d7cd9dc1-99b8-4ffa-b801-4484808fe05a)
 
