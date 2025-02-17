@@ -14,12 +14,13 @@ edit text.
 </details>
 
 # Features
-- open text files
-- save text file
+- open text files,python files
+- save text file,pytho files
 - change font
 - change font size
 - change colorscheme
 - change dark/light mode
+
 
 # Usage
 ```bash
