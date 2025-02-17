@@ -1,7 +1,7 @@
 # TextEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
-simple text editor written in python.
+edit text.
 
 # Screenshot
 </details>
