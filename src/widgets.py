@@ -6,10 +6,50 @@ from tkinter import simpledialog
 import sys
 from CTkListbox import *
 from settings import *
+from tkinter import messagebox
 
 
-# Start Screen?
 
+class StartScreen(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+
+        self.geometry("400x300")
+        self.title("NoteEditor")
+        self.maxsize(400,300)
+        self.minsize(400,300)
+        ctk.set_appearance_mode("system")
+        ctk.set_default_color_theme("green")
+
+        def start_app():
+            self.destroy()
+        def on_closing():
+            if messagebox.askokcancel("Exit","Are you sure you want to close the window?"):
+                sys.exit(0)
+
+        start_btn = ctk.CTkButton(self,text="Start",command=start_app)
+        start_btn.place(x=230,y=130)
+
+        quit_btn = ctk.CTkButton(self,text="Quit",command=on_closing)
+        quit_btn.place(x=230,y=180)
+
+        
+        image_ = tk.PhotoImage(file="image_2.png",)
+        image_ = image_.subsample(3,3)
+        photo = tk.Label(self,image=image_)
+
+        photo.place(x=10,y=80)
+
+        header = ctk.CTkLabel(self,text="NoteEditor",font=("opensans",40))
+        header.place(x=10,y=15)
+        
+        self.protocol("WM_DELETE_WINDOW",on_closing)
+
+
+        self.mainloop()
+
+        
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -119,26 +159,26 @@ class Widgets(ctk.CTkFrame):
                 root.minsize(200,200)
 
                 def change_selected(selected):
-                    if selected == "Hacker colors":
-                        self.text_color = "green"
+                    if selected == "Dark Slate Grey":
+                        self.fg_color = "#374b4a"
                         self.update_textbox_font()
-                    elif selected == "White colors":
-                        self.text_color = "white"
+                    elif selected == "Pumpkin":
+                        self.fg_color = "#ff8c42"
                         self.update_textbox_font()
-                    elif selected == "Blue colors":
-                        self.text_color = "blue"
+                    elif selected == "Vermilton":
+                        self.fg_color = "#ff3c38"
                         self.update_textbox_font()
-                    elif selected == "Red colors":
-                        self.text_color = "red"
+                    elif selected == "Standard":
+                        self.fg_color = background_color
                         self.update_textbox_font()
 
                 colorschemes = CTkListbox(root,width=170,height=180,command=change_selected)
                 colorschemes.place(x=0,y=0)
 
-                colorschemes.insert(0,"Hacker colors")
-                colorschemes.insert(1,"White colors")
-                colorschemes.insert(2,"Red colors")
-                colorschemes.insert(3,"Blue colors")
+                colorschemes.insert(3,"Dark Slate Grey")
+                colorschemes.insert(1,"Pumpkin")
+                colorschemes.insert(2,"Vermilton")
+                colorschemes.insert(0,"Standard")
 
                 root.mainloop()
             
