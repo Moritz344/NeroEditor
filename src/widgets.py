@@ -65,6 +65,7 @@ class Widgets(ctk.CTkFrame):
         self.menu_func(window)
 
         self.path = path
+
         
         self.file_name(window,self.path)
         # self.rename_file(window)
@@ -120,6 +121,7 @@ class Widgets(ctk.CTkFrame):
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
+    
 
 
     def menu_func(self,master):
@@ -135,7 +137,15 @@ class Widgets(ctk.CTkFrame):
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                 except Exception as e:
-                    print("You closed the window. No new file opened.")
+                    print("what did you do to get this bro lock in")
+            def save():
+                try:
+                    with open(self.path,"w",encoding="utf-8") as file:
+                        content = self.textbox.get(1.0,tk.END)
+                        file.write(content)
+                        
+                except Exception :
+                    print("use your brain ones pls")
                 
             def save_file():
                 try:
@@ -148,7 +158,7 @@ class Widgets(ctk.CTkFrame):
                             file.write(content) # speichert den text in die datei
 
                 except Exception as e:
-                    print("You closed the window. No new file saved.")
+                    print("Bro opened the window to close it again ")
 
 
             def close_file():
@@ -260,7 +270,8 @@ github @Moritz344 or if you need any help."""
             
             
             fileMenu.add_command(label="Open",command=open_file )
-            fileMenu.add_command(label="Save",command=save_file )
+            fileMenu.add_command(label="Save",command=save)
+            fileMenu.add_command(label="Save New File",command=save_file )
             fileMenu.add_command(label="Exit",command=close_file)
             fileMenu.add_separator()
 

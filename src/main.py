@@ -8,7 +8,14 @@ class App(ctk.CTk):
         ctk.set_appearance_mode("system")
         self.geometry("1000x600")
         self.minsize(1000,600)
-        self.title("Text Editor")
+        self.title("NoteEditor")
+
+
+        def on_closing():
+            if messagebox.askyesno("Exit","WAIT!!! ARE YOU SURE YOU SAVED YOUR FILE??? (calmly)"):
+                self.destroy()
+
+        self.protocol("WM_DELETE_WINDOW",on_closing)
         
         Widgets(self)
 
