@@ -7,8 +7,9 @@ edit text.
 </details>
 <details>
 <summary>Screenshot</summary>
-
-![Screenshot_68](https://github.com/user-attachments/assets/d7cd9dc1-99b8-4ffa-b801-4484808fe05a)
+  
+![Screenshot_76](https://github.com/user-attachments/assets/fad40caa-f9dc-4b3c-ae60-1021eeb651f6)
+![Screenshot_77](https://github.com/user-attachments/assets/04a3fb2c-9989-4cf0-a9bf-1c7c24502b70)
 
 
 </details>
