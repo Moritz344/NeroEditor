@@ -1,7 +1,7 @@
 # NoteEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
-edit text.
+NoteEditor is a simple and flexible text editor with basic features for editing text
 
 # Screenshot
 </details>
