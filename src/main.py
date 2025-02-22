@@ -22,6 +22,6 @@ class App(ctk.CTk):
         self.mainloop()
 
 
-StartScreen()
+#StartScreen()
 App()
 

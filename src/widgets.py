@@ -7,6 +7,11 @@ import sys
 from CTkListbox import *
 from settings import *
 from tkinter import messagebox
+import json
+
+
+# TODO: Fenster wie bei font z.B max window size und min window size ändern
+# TODO: ui schöner machen
 
 
 
@@ -55,10 +60,16 @@ class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
         
-        self.font = "Arial"
+        self.font = font
+        self.colorscheme = colorscheme
+
+        self.files = files
+
+
         self.font_size = standard_font_size
         self.max_font_size = max_font_size
         self.min_font_size = min_font_size
+
         self.text_color = "white"
         self.fg_color = background_color
         self.create_textbox(window)
@@ -66,9 +77,7 @@ class Widgets(ctk.CTkFrame):
 
         self.path = path
 
-        
         self.file_name(window,self.path)
-        # self.rename_file(window)
 
         # gedrückte tasten
         self.pressed_keys = set()
@@ -77,22 +86,20 @@ class Widgets(ctk.CTkFrame):
         window.bind("<KeyRelease>",self.key_release)
 
     def file_name(self,window,path):
-        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#007090",hover_color="#01a7c2")
+        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#007090",hover_color="#01a7c2",
+        font=("opensans",15)
+                                      )
         self.file_btn.place(x=0,y=0)
 
-    def rename_file(self,window):
-        # frägt beim starten der app nach einem namen für eine datei
-        new_name = simpledialog.askstring("Rename","Enter a new file name: ")
+            
 
-        if new_name:
-            self.update_file_name(new_name)
 
 
     def update_file_name(self,path):
         self.path = path
-        # als ob das funktioniert hat
         path = self.path.split("/")
         self.file_btn.configure(text=path[-1])
+        
         
         
     def key_press(self,event):
@@ -121,23 +128,40 @@ class Widgets(ctk.CTkFrame):
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
-    
 
+
+    def write_preferences_to_json(self,main,key,new_value):
+        try:
+            # get the content of the file
+            with open("data.json","r") as file:
+                content = json.load(file)
+            # wenn die 'preferences' kategorie existiert
+            if main in content:
+                # z.b: content["preferences"]["font"] = "Arial"
+                content[main][key] = new_value
+
+
+
+            with open("data.json","w") as file:
+                # aktualisiere json file
+                json.dump(content,file,indent=4)
+        except Exception as e:
+            print(e)
 
     def menu_func(self,master):
             def open_file():
                 try:
                  # file path
                  self.path = filedialog.askopenfile(title="Open File",filetypes=[("Textdateien","*.txt",),("Python-Dateien","*.py")],).name
-                
                  if self.path:
                      self.update_file_name(self.path)
+                     self.write_preferences_to_json("other","files",self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
                          content = file.read()
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                 except Exception as e:
-                    print("what did you do to get this bro lock in")
+                    print("please please please")
             def save():
                 try:
                     with open(self.path,"w",encoding="utf-8") as file:
@@ -145,7 +169,7 @@ class Widgets(ctk.CTkFrame):
                         file.write(content)
                         
                 except Exception :
-                    print("use your brain ones pls")
+                    print("oof")
                 
             def save_file():
                 try:
@@ -154,12 +178,12 @@ class Widgets(ctk.CTkFrame):
                     if self.path:
                         self.update_file_name(self.path)
                         with open(self.path,"w",encoding="utf-8") as file:
-                            content = self.textbox.get(1.0,tk.END) # holt den text aus dem editor
-                            file.write(content) # speichert den text in die datei
+                            content = self.textbox.get(1.0,tk.END)
+                            file.write(content) 
 
                 except Exception as e:
-                    print("Bro opened the window to close it again ")
-
+                    print("AHHHHHHHHHHHHHHH")
+            
 
             def close_file():
                 sys.exit(0)
@@ -178,17 +202,28 @@ class Widgets(ctk.CTkFrame):
                     elif selected == "Vermilton":
                         self.fg_color = "#ff3c38"
                         self.update_textbox_font()
+                    elif selected == "Last Used":
+                        self.fg_color = self.colorscheme
+                        self.update_textbox_font()
                     elif selected == "Standard":
                         self.fg_color = background_color
                         self.update_textbox_font()
 
+                    self.write_preferences_to_json("preferences","colorscheme",self.fg_color)
+
+
+
+
+
+
                 colorschemes = CTkListbox(root,width=170,height=180,command=change_selected)
                 colorschemes.place(x=0,y=0)
 
-                colorschemes.insert(3,"Dark Slate Grey")
-                colorschemes.insert(1,"Pumpkin")
+                colorschemes.insert(4,"Dark Slate Grey")
+                colorschemes.insert(3,"Pumpkin")
                 colorschemes.insert(2,"Vermilton")
-                colorschemes.insert(0,"Standard")
+                colorschemes.insert(0,"Last Used")
+                colorschemes.insert(1,"Standard")
 
                 root.mainloop()
             
@@ -202,6 +237,7 @@ class Widgets(ctk.CTkFrame):
 
                 def change_font(selected):
                     self.font = selected
+                    self.write_preferences_to_json("preferences","font",selected)
                     self.update_textbox_font()
 
                 listbox = CTkListbox(root,height=200,command=change_font)
@@ -212,6 +248,7 @@ class Widgets(ctk.CTkFrame):
                 listbox.insert(3,"Bahnschrift")
                 listbox.insert(4,"Calibri")
                 listbox.insert("END","chiller")
+
 
                 root.mainloop()
 
@@ -282,8 +319,10 @@ github @Moritz344 or if you need any help."""
             subMenu.add_command(label="Colorscheme",command=change_colors)
             subMenu.add_command(label="Light mode",command=light_mode)
             subMenu.add_command(label="Dark mode",command=dark_mode)
-
-
+            
+            RecentMenu = Menu(fileMenu,tearoff=0)
+            fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
+            RecentMenu.add_command(label=f"{files}")
 
 
 
