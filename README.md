@@ -16,7 +16,7 @@ NoteEditor is a simple and flexible text editor with basic features for editing 
 
 # Features
 - open text files,python files
-- save text file,pytho files
+- save text file,python files
 - change font
 - change font size
 - change colorscheme
