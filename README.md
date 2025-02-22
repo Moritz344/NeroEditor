@@ -21,6 +21,7 @@ NoteEditor is a simple and flexible text editor with basic features for editing 
 - change font size
 - change colorscheme
 - change dark/light mode
+- See Recent File
 
 
 # Usage
