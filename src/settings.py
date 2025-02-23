@@ -11,9 +11,10 @@ def get_data_from_json() -> str:
             background_color = data["other"]["background_color"]
             path = data["other"]["path"]
             files = data["other"]["files"]
+            project_name=data["other"]["project_name"]
 
 
-            return font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files
+            return font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name
             
-font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files = get_data_from_json()
+font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name = get_data_from_json()
 

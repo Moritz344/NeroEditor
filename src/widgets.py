@@ -9,9 +9,13 @@ from settings import *
 from tkinter import messagebox
 import json
 
+from PIL import Image,ImageTk
+
 
 # TODO: Fenster wie bei font z.B max window size und min window size ändern
 # TODO: ui schöner machen
+# TODO: make a release on github
+# TODO: README schöner machen mit logo und design
 
 
 
@@ -20,35 +24,67 @@ class StartScreen(ctk.CTk):
         super().__init__()
 
 
-        self.geometry("400x300")
-        self.title("NoteEditor")
-        self.maxsize(400,300)
-        self.minsize(400,300)
+        self.geometry("800x600")
+        self.title(project_name)
+        self.maxsize(800,600)
+        self.minsize(800,600)
         ctk.set_appearance_mode("system")
-        ctk.set_default_color_theme("green")
+
 
         def start_app():
             self.destroy()
         def on_closing():
-            if messagebox.askokcancel("Exit","Are you sure you want to close the window?"):
+            if messagebox.askyesno("Exit","Are you sure you want to close the window?"):
                 sys.exit(0)
 
-        start_btn = ctk.CTkButton(self,text="Start",command=start_app)
-        start_btn.place(x=230,y=130)
+        button_frame = ctk.CTkFrame(self,width=800,height=420,fg_color="#222222")
+        button_frame.place(x=0,y=180)
 
-        quit_btn = ctk.CTkButton(self,text="Quit",command=on_closing)
-        quit_btn.place(x=230,y=180)
+        header_frame = ctk.CTkFrame(self,width=800,height=200,corner_radius=0,fg_color="#222222")
+
+        start_btn = ctk.CTkButton(
+        master=button_frame,
+        text="Start",
+        width=200,
+        height=50,
+        font=("opensans",50),
+        command=start_app
+
+        )
+
+        start_btn.place(x=280,y=130)
+
+        quit_btn = ctk.CTkButton(
+        button_frame,
+        width=200,
+        text="Quit",
+        font=("opensans",50),
+        command=on_closing
+        )
+
+        quit_btn.place(x=280,y=210)
 
         
-        image_ = tk.PhotoImage(file="image_2.png",)
-        image_ = image_.subsample(3,3)
-        photo = tk.Label(self,image=image_)
+        github_icon = Image.open("assets/github_icon.png")
+        github_icon = github_icon.convert("RGBA")
 
-        photo.place(x=10,y=80)
+        photo = ctk.CTkImage(light_image=github_icon,size=(50,50))
 
-        header = ctk.CTkLabel(self,text="NoteEditor",font=("opensans",40))
-        header.place(x=10,y=15)
+        label = ctk.CTkLabel(self,text="",image=photo)
+        label.place(x=10,y=540)
+
+        header_frame.place(x=0,y=0)
+        header = ctk.CTkLabel(
+        header_frame,
+        text="Welcome",
+        width=300,
+        height=100,
+        font=("Segoe UI Light",100),
+        corner_radius=10
+        )
+        header.place(x=180,y=50)
         
+
         self.protocol("WM_DELETE_WINDOW",on_closing)
 
 
@@ -59,6 +95,7 @@ class StartScreen(ctk.CTk):
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
+
         
         self.font = font
         self.colorscheme = colorscheme
@@ -135,7 +172,7 @@ class Widgets(ctk.CTkFrame):
             # get the content of the file
             with open("data.json","r") as file:
                 content = json.load(file)
-            # wenn die 'preferences' kategorie existiert
+
             if main in content:
                 # z.b: content["preferences"]["font"] = "Arial"
                 content[main][key] = new_value
@@ -232,15 +269,24 @@ class Widgets(ctk.CTkFrame):
             def update_font():
                 root = ctk.CTk()
                 root.title("Font")
-                root.geometry("200x250")
-                root.minsize(200,250)
+                root.geometry("190x230")
+                root.maxsize(190,230)
+                root.minsize(190,230)
 
                 def change_font(selected):
                     self.font = selected
                     self.write_preferences_to_json("preferences","font",selected)
                     self.update_textbox_font()
 
-                listbox = CTkListbox(root,height=200,command=change_font)
+                listbox = CTkListbox(root,
+                height=200,
+                command=change_font,
+                border_width=0,
+                fg_color=background_color,
+                scrollbar_button_color=background_color,
+                scrollbar_button_hover_color=background_color
+
+                )
                 listbox.place(x=10,y=10)
                 listbox.insert(0,"opensans")
                 listbox.insert(1,"Arial")
