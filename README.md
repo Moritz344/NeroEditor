@@ -1,4 +1,4 @@
-# NoteEditor
+# NeroEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
 NeroEditor is a simple and flexible text editor with basic features for editing text
