@@ -1,0 +1,42 @@
+def login()
+
+if  username_entry.get() ==
+
+else
+
+
+
+# Hauptfenster erstellen
+
+window = 
+window.title 
+
+
+# Benutzereingabefelder erstellen
+
+Benutzername:
+username_label = tk.Label
+username_label.pack()
+username_entry = tk.Entry
+username_entry.pack() 
+
+e-mail:
+
+same
+
+# Anmeldebutton erstellen
+
+
+login_button = tk.Button(window,)
+login_button.pack()
+
+# Ausgabelabel erstellen
+
+result_label = tk.Label(
+result_label.pack()
+
+
+window.mainloop()
+
+
+

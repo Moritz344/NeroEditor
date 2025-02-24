@@ -12,11 +12,6 @@ import json
 from PIL import Image,ImageTk
 
 
-# TODO: Fenster wie bei font z.B max window size und min window size ändern
-# TODO: ui schöner machen
-# TODO: make a release on github
-# TODO: README schöner machen mit logo und design
-
 
 
 class StartScreen(ctk.CTk):
@@ -228,6 +223,7 @@ class Widgets(ctk.CTkFrame):
                 root = ctk.CTk()
                 root.title("Colorschemes")
                 root.minsize(200,200)
+                root.maxsize(200,200)
 
                 def change_selected(selected):
                     if selected == "Dark Slate Grey":
@@ -253,8 +249,18 @@ class Widgets(ctk.CTkFrame):
 
 
 
-                colorschemes = CTkListbox(root,width=170,height=180,command=change_selected)
-                colorschemes.place(x=0,y=0)
+                colorschemes = CTkListbox(
+                master=root,
+                width=170,
+                height=183,
+                command=change_selected,
+                border_width=0,
+                fg_color=background_color,
+                scrollbar_button_color=background_color,
+                scrollbar_button_hover_color=background_color
+
+                )
+                colorschemes.place(x=5,y=0)
 
                 colorschemes.insert(4,"Dark Slate Grey")
                 colorschemes.insert(3,"Pumpkin")
@@ -303,6 +309,7 @@ class Widgets(ctk.CTkFrame):
                 root.geometry("650x300")
                 root.title("About")
                 root.maxsize(650,300)
+                root.minsize(650,300)
                 
                 
                 text_list="""Thanks for using this app!
@@ -319,10 +326,12 @@ github @Moritz344 or if you need any help."""
                     font=("opensans",20),
                     width=700,
                     height=500,
-                    text_color="green",
-                    fg_color="black",
+                    text_color="white",
+                    fg_color=background_color,
 
                 )
+
+
                 normal_text.insert("10.0",text_list)
                 normal_text.configure(state="disabled")
                 normal_text.place(x=0,y=0)
@@ -336,6 +345,19 @@ github @Moritz344 or if you need any help."""
                 self.fg_color = "#171614"
                 self.text_color = "white"
                 self.update_textbox_font()
+
+            def open_recent_file() -> None:
+
+                with open(self.files,"r",encoding="utf-8") as file:
+                    content = file.read()
+                    
+                    path_name = self.files.split("/")
+                    path_recent = path_name[-1]
+                    self.update_file_name(path_recent)
+
+                    self.textbox.delete(tk.END,1.0)
+                    self.textbox.insert(1.0,content)
+
 
             menu = Menu(master)
             master.configure(menu=menu)
@@ -368,7 +390,7 @@ github @Moritz344 or if you need any help."""
             
             RecentMenu = Menu(fileMenu,tearoff=0)
             fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
-            RecentMenu.add_command(label=f"{files}")
+            RecentMenu.add_command(label=f"{files}",command=open_recent_file)
 
 
 
