@@ -3,6 +3,7 @@
 
 NeroEditor is a simple and flexible text editor with basic features for editing text
 
+
 ![GkNfigvXkAEkHH6](https://github.com/user-attachments/assets/5f7a76df-df6e-4c0a-a0e0-ba01e32ca6b8)
 
 
@@ -33,12 +34,16 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 
 # Usage
 ```bash
-git clone https://github.com/Moritz344/TextEditor.git
+git clone https://github.com/Moritz344/NeroEditor.git
 cd TextEditor
 cd src
 python3 main.py
 
 ```
+
+⚠ Note: This pre-release does not include any executable files yet.
+If you want to test the app, you'll need to build it from the source code.
+
 
 # Author
 - Moritz344
