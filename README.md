@@ -31,6 +31,13 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 - See Recent File
 - See Current File
 
+# Requirements
+- Python
+- tkinter
+- customtkinter
+- sys
+- CTkListbox
+
 
 # Usage
 ```bash
@@ -40,6 +47,7 @@ cd src
 python3 main.py
 
 ```
+
 
 ⚠ Note: There is no  executable files yet.
 If you want to test the app, you'll need to build it from the source code.
