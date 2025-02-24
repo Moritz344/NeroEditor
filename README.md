@@ -41,7 +41,7 @@ python3 main.py
 
 ```
 
-⚠ Note: This pre-release does not include any executable files yet.
+⚠ Note: There is no  executable files yet.
 If you want to test the app, you'll need to build it from the source code.
 
 
