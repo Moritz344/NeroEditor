@@ -42,7 +42,7 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 # Usage
 ```bash
 git clone https://github.com/Moritz344/NeroEditor.git
-cd TextEditor
+cd NeroEditor
 cd src
 python3 main.py
 
