@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import subprocess
+import os
 from tkinter import *
 import tkinter as tk
 from tkinter import filedialog
@@ -11,7 +13,12 @@ import json
 
 from PIL import Image,ImageTk
 
-
+# MÜSSTEN SOWEIT GEFIXED ODER ERLEDIGT SEIN:
+#----------------------------------------------------------
+# BUGS: Beim öffnen von recent file löscht sich der inhalt der letzten datei nicht aber der pfad ändert sich
+# TODO: Terminal sollte sich in einem neuen fenster öffnen 
+# BUGS: Wenn der user auf recent file klickt und dann auf ausführen wird die datei nicht gefunden das könnte daran liegen das nicht der volle pfad genutz wird
+#----------------------------------------------------------
 
 
 class StartScreen(ctk.CTk):
@@ -96,6 +103,9 @@ class Widgets(ctk.CTkFrame):
         self.colorscheme = colorscheme
 
         self.files = files
+        
+        self.used_files = []
+
 
 
         self.font_size = standard_font_size
@@ -104,10 +114,12 @@ class Widgets(ctk.CTkFrame):
 
         self.text_color = "white"
         self.fg_color = background_color
-        self.create_textbox(window)
         self.menu_func(window)
+        self.create_textbox(window)
 
         self.path = path
+
+        self.recent_files()
 
         self.file_name(window,self.path)
 
@@ -125,7 +137,8 @@ class Widgets(ctk.CTkFrame):
 
             
 
-
+    def recent_files(self,):
+        pass
 
     def update_file_name(self,path):
         self.path = path
@@ -177,6 +190,7 @@ class Widgets(ctk.CTkFrame):
             with open("data.json","w") as file:
                 # aktualisiere json file
                 json.dump(content,file,indent=4)
+
         except Exception as e:
             print(e)
 
@@ -186,6 +200,7 @@ class Widgets(ctk.CTkFrame):
                  # file path
                  self.path = filedialog.askopenfile(title="Open File",filetypes=[("Textdateien","*.txt",),("Python-Dateien","*.py")],).name
                  if self.path:
+                     self.used_files.append(self.path)
                      self.update_file_name(self.path)
                      self.write_preferences_to_json("other","files",self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
@@ -346,6 +361,18 @@ github @Moritz344 or if you need any help."""
                 self.text_color = "white"
                 self.update_textbox_font()
 
+            def run_python_file() -> None:
+                with open(self.path,"r",encoding="utf-8") as file:
+                    content = file.read()
+
+                    try:
+                        subprocess.run(["python",self.path],
+                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+
+                    except Exception as e:
+                        print("Fehler beim Öffnen der Datei.",e)
+
+
             def open_recent_file() -> None:
 
                 with open(self.files,"r",encoding="utf-8") as file:
@@ -353,10 +380,13 @@ github @Moritz344 or if you need any help."""
                     
                     path_name = self.files.split("/")
                     path_recent = path_name[-1]
-                    self.update_file_name(path_recent)
 
-                    self.textbox.delete(tk.END,1.0)
+                    self.update_file_name(self.files)
+                    
+                    self.textbox.delete(1.0,tk.END)
                     self.textbox.insert(1.0,content)
+
+
 
 
             menu = Menu(master)
@@ -365,13 +395,18 @@ github @Moritz344 or if you need any help."""
     
             fileMenu = Menu(menu,tearoff=False)
             helpMenu = Menu(menu,tearoff=False)
+            ausführenMenu = Menu(menu,tearoff=False)
+
             
             # adding the menus
             menu.add_cascade(label="File", menu=fileMenu)
             menu.add_cascade(label="Help",menu=helpMenu)
+            menu.add_cascade(label="Ausführen",menu=ausführenMenu)
             
 
             helpMenu.add_command(label="About",command=about_window)
+
+            ausführenMenu.add_command(label="Run Python Script",command=run_python_file)
             
             
             fileMenu.add_command(label="Open",command=open_file )
@@ -391,6 +426,4 @@ github @Moritz344 or if you need any help."""
             RecentMenu = Menu(fileMenu,tearoff=0)
             fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
             RecentMenu.add_command(label=f"{files}",command=open_recent_file)
-
-
-
+                

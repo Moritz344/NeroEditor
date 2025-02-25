@@ -1,8 +1,7 @@
 {
     "preferences": {
         "font": "opensans",
-        "colorscheme": "#171614",
-        "files": "C:/Users/tmaie/OneDrive/Dokumente/Bullet Logic.txt"
+        "colorscheme": "#171614"
     },
     "other": {
         "standard_font_size": 25,
@@ -11,6 +10,6 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "C:/Users/tmaie/OneDrive/Dokumente/def login().txt"
+        "files": "C:/Users/tmaie/OneDrive/Dokumente/Ordner/eee.py"
     }
 }
