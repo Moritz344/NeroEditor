@@ -1,6 +1,6 @@
 {
     "preferences": {
-        "font": "opensans",
+        "font": "Comic Sans MS",
         "colorscheme": "#171614"
     },
     "other": {
@@ -10,6 +10,6 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "C:/Users/tmaie/OneDrive/Dokumente/Ordner/eee.py"
+        "files": "C:/Users/tmaie/OneDrive/Dokumente/Ordner/test123.txt"
     }
 }

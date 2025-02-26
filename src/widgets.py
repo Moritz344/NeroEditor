@@ -13,12 +13,8 @@ import json
 
 from PIL import Image,ImageTk
 
-# MÜSSTEN SOWEIT GEFIXED ODER ERLEDIGT SEIN:
-#----------------------------------------------------------
-# BUGS: Beim öffnen von recent file löscht sich der inhalt der letzten datei nicht aber der pfad ändert sich
-# TODO: Terminal sollte sich in einem neuen fenster öffnen 
-# BUGS: Wenn der user auf recent file klickt und dann auf ausführen wird die datei nicht gefunden das könnte daran liegen das nicht der volle pfad genutz wird
-#----------------------------------------------------------
+# TODO: Icons in Buttons
+# TODO: Markdown support?
 
 
 class StartScreen(ctk.CTk):
@@ -39,7 +35,8 @@ class StartScreen(ctk.CTk):
             if messagebox.askyesno("Exit","Are you sure you want to close the window?"):
                 sys.exit(0)
 
-        button_frame = ctk.CTkFrame(self,width=800,height=420,fg_color="#222222")
+
+        button_frame = ctk.CTkFrame(self,width=800,height=420,fg_color="#222222",)
         button_frame.place(x=0,y=180)
 
         header_frame = ctk.CTkFrame(self,width=800,height=200,corner_radius=0,fg_color="#222222")
@@ -50,7 +47,7 @@ class StartScreen(ctk.CTk):
         width=200,
         height=50,
         font=("opensans",50),
-        command=start_app
+        command=start_app,
 
         )
 
@@ -119,9 +116,12 @@ class Widgets(ctk.CTkFrame):
 
         self.path = path
 
-        self.recent_files()
+        # button + icons für dateien
+        self.text_icon = ctk.CTkImage(light_image=Image.open("assets/note.png"),size=(20,20))
+        self.final_icon = self.text_icon
+        self.python_icon = ctk.CTkImage(light_image=Image.open("assets/python_icon.png"),size=(20,20))
+        self.file_name(window,self.path,self.final_icon)
 
-        self.file_name(window,self.path)
 
         # gedrückte tasten
         self.pressed_keys = set()
@@ -129,22 +129,34 @@ class Widgets(ctk.CTkFrame):
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
 
-    def file_name(self,window,path):
-        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#007090",hover_color="#01a7c2",
-        font=("opensans",15)
-                                      )
+    def update_icon(self):
+        if ".py" in self.path:
+            self.file_btn.configure(image=self.python_icon)
+        else:
+            self.file_btn.configure(image=self.text_icon)
+
+
+    def file_name(self,window,path,final_icon):
+
+        
+        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#32373b",
+        font=("opensans",15),
+        image=final_icon,
+        )
+
+        self.update_icon()
+
         self.file_btn.place(x=0,y=0)
 
             
 
-    def recent_files(self,):
-        pass
 
     def update_file_name(self,path):
         self.path = path
         path = self.path.split("/")
         self.file_btn.configure(text=path[-1])
         
+        self.update_icon()
         
         
     def key_press(self,event):
@@ -314,6 +326,8 @@ class Widgets(ctk.CTkFrame):
                 listbox.insert(2,"Times New Roman")
                 listbox.insert(3,"Bahnschrift")
                 listbox.insert(4,"Calibri")
+                listbox.insert(5,"Cambria")
+                listbox.insert(6,"Comic Sans MS")
                 listbox.insert("END","chiller")
 
 
@@ -426,4 +440,7 @@ github @Moritz344 or if you need any help."""
             RecentMenu = Menu(fileMenu,tearoff=0)
             fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
             RecentMenu.add_command(label=f"{files}",command=open_recent_file)
-                
+ 
+
+
+
