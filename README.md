@@ -37,6 +37,7 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 - customtkinter
 - sys
 - CTkListbox
+- subprocess
 
 
 # Usage
