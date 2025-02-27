@@ -13,9 +13,8 @@ import json
 
 from PIL import Image,ImageTk
 
-# TODO: Icons in Buttons
-# TODO: Markdown support?
-
+# TODO: Wort/Zeichenzähler
+# TODO: Tabs oder mehrere Dateien gleichzeitig öffnen
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -89,6 +88,8 @@ class StartScreen(ctk.CTk):
 
         self.mainloop()
 
+
+        
         
 
 class Widgets(ctk.CTkFrame):
@@ -102,17 +103,20 @@ class Widgets(ctk.CTkFrame):
         self.files = files
         
         self.used_files = []
-
-
+        
+        self.textbox = None
+        self.counter = None
 
         self.font_size = standard_font_size
         self.max_font_size = max_font_size
         self.min_font_size = min_font_size
+        self.font_art = "normal"
 
         self.text_color = "white"
         self.fg_color = background_color
         self.menu_func(window)
         self.create_textbox(window)
+        self.create_counter(window)
 
         self.path = path
 
@@ -125,9 +129,12 @@ class Widgets(ctk.CTkFrame):
 
         # gedrückte tasten
         self.pressed_keys = set()
-        
+
+
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
+
+        
 
     def update_icon(self):
         if ".py" in self.path:
@@ -135,6 +142,24 @@ class Widgets(ctk.CTkFrame):
         else:
             self.file_btn.configure(image=self.text_icon)
 
+    def count_lines(self):
+        content = self.textbox.get("1.0","end")
+        lines = content.split("\n")
+
+        for i,line in enumerate(lines):
+            count = self.counter.cget("text")
+
+
+            self.counter.configure(text=f"Lines: {i}")
+
+
+
+    def current_window_size(self,window,) -> int:
+        
+        width,height =  window.winfo_width(),window.winfo_height()
+
+        return width,height
+                
 
     def file_name(self,window,path,final_icon):
 
@@ -143,20 +168,22 @@ class Widgets(ctk.CTkFrame):
         font=("opensans",15),
         image=final_icon,
         )
-
+        
         self.update_icon()
+        
 
         self.file_btn.place(x=0,y=0)
 
             
 
 
-    def update_file_name(self,path):
+    def update_file_name(self,path) -> str:
         self.path = path
         path = self.path.split("/")
         self.file_btn.configure(text=path[-1])
-        
+        self.path_len = len(path[-1])
         self.update_icon()
+
         
         
     def key_press(self,event):
@@ -176,12 +203,44 @@ class Widgets(ctk.CTkFrame):
        elif "Control_L" in self.pressed_keys and "minus" in self.pressed_keys and self.font_size >= self.min_font_size:
            self.font_size -= 1
            self.update_textbox_font()
+
+       elif  "Control_L" in self.pressed_keys and "z" in self.pressed_keys :
+            self.undo()
+       elif "Control_L" in self.pressed_keys and "y" in self.pressed_keys:
+            self.redo()
     
-            
+    def undo(self):
+        try:
+            self.textbox.edit_undo()
+        except Exception :
+            print("nothing to undo.")
+    def redo(self):
+        try:
+            self.textbox.edit_redo()
+        except Exception:
+            print("nothing to redo")
+
+    def create_counter(self,window):
+
+        info_frame = ctk.CTkFrame(window,width=140,height=20,corner_radius=0)
+        info_frame.place(x=0,y=28)
+
+        self.encoding = ctk.CTkLabel(info_frame,text="| utf-8",width=200,height=0)
+        self.encoding.place(x=10,y=3)
+
+        self.counter = ctk.CTkLabel(info_frame,text="Lines: 0",width=0,height=0)
+        self.counter.place(x=2,y=3)
 
     def create_textbox(self,window):
-        self.textbox = ctk.CTkTextbox(window,width=1920,height=1080,corner_radius=0,text_color=self.text_color,fg_color=self.fg_color,font=(self.font,self.font_size))
-        self.textbox.place(x=0,y=28)
+
+        
+
+        self.textbox = ctk.CTkTextbox(window,width=1920,height=1080,corner_radius=0,
+        text_color=self.text_color,
+        fg_color=self.fg_color,
+        undo=True,
+        font=(self.font,self.font_size,self.font_art))
+        self.textbox.place(x=0,y=49)
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
@@ -210,7 +269,10 @@ class Widgets(ctk.CTkFrame):
             def open_file():
                 try:
                  # file path
-                 self.path = filedialog.askopenfile(title="Open File",filetypes=[("Textdateien","*.txt",),("Python-Dateien","*.py")],).name
+                 self.path = filedialog.askopenfile(title="Open File",
+                 filetypes=[("Textdateien","*.txt",),
+                ("Python-Dateien","*.py"),
+                ("Markdown","*.md")]).name
                  if self.path:
                      self.used_files.append(self.path)
                      self.update_file_name(self.path)
@@ -219,8 +281,9 @@ class Widgets(ctk.CTkFrame):
                          content = file.read()
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
+                         self.count_lines()
                 except Exception as e:
-                    print("please please please")
+                    print("please please please",e)
             def save():
                 try:
                     with open(self.path,"w",encoding="utf-8") as file:
@@ -232,7 +295,11 @@ class Widgets(ctk.CTkFrame):
                 
             def save_file():
                 try:
-                    self.path = filedialog.asksaveasfile(title="Save File",filetypes=[("Textdateien","*.txt"),("Python-Dateien","*.py")]).name
+                    self.path = filedialog.asksaveasfile(title="Save File",filetypes=
+                    [("Textdateien","*.txt"),
+                    ("Python-Dateien","*.py"),
+                    ("Markdown-Dateien","*.md")]).name
+
                 
                     if self.path:
                         self.update_file_name(self.path)
@@ -241,7 +308,7 @@ class Widgets(ctk.CTkFrame):
                             file.write(content) 
 
                 except Exception as e:
-                    print("AHHHHHHHHHHHHHHH")
+                    print("AHHHHHHHHHHHHHHH",e)
             
 
             def close_file():
@@ -400,6 +467,7 @@ github @Moritz344 or if you need any help."""
                     self.textbox.delete(1.0,tk.END)
                     self.textbox.insert(1.0,content)
 
+                    self.count_lines()
 
 
 
