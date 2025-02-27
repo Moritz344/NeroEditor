@@ -19,12 +19,12 @@ class App(ctk.CTk):
 
         self.protocol("WM_DELETE_WINDOW",on_closing)
 
-        
         Widgets(self)
+        
 
         self.mainloop()
 
 
-#StartScreen()
+StartScreen()
 App()
 
