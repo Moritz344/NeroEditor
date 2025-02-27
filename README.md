@@ -30,6 +30,9 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 - change dark/light mode
 - See Recent File
 - See Current File
+- Ctrl+z(undo)
+- Ctrl+y(redo)
+- line counter
 
 # Requirements
 - Python
