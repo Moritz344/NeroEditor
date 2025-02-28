@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import CTkMessagebox
 from widgets import *
 from tkinter import *
 from settings import project_name
@@ -14,8 +15,21 @@ class App(ctk.CTk):
 
 
         def on_closing():
-            if messagebox.askyesno("Exit","Are you sure you saved your file?"):
+            msg = CTkMessagebox.CTkMessagebox(
+            self,
+            icon="warning",
+            title="Exit",
+            option_1="No",
+            option_2="Yes",
+            text_color="red",
+            message="Are you sure you saved your file?",
+            fade_in_duration=0.5,
+            font=(font,20),
+                    )
+            response = msg.get()
+            if response == "Yes":
                 self.destroy()
+
 
         self.protocol("WM_DELETE_WINDOW",on_closing)
 
@@ -27,4 +41,5 @@ class App(ctk.CTk):
 
 StartScreen()
 App()
+
 

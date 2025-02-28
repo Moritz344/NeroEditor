@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import subprocess
+import CTkMessagebox
 import os
 from tkinter import *
 import tkinter as tk
@@ -10,11 +11,11 @@ from CTkListbox import *
 from settings import *
 from tkinter import messagebox
 import json
-
 from PIL import Image,ImageTk
 
-# TODO: Wort/Zeichenzähler
-# TODO: Tabs oder mehrere Dateien gleichzeitig öffnen
+# TODO: Ersetze Messageboxen
+
+
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -30,9 +31,7 @@ class StartScreen(ctk.CTk):
 
         def start_app():
             self.destroy()
-        def on_closing():
-            if messagebox.askyesno("Exit","Are you sure you want to close the window?"):
-                sys.exit(0)
+
 
 
         button_frame = ctk.CTkFrame(self,width=800,height=420,fg_color="#222222",)
@@ -50,6 +49,7 @@ class StartScreen(ctk.CTk):
 
         )
 
+
         start_btn.place(x=280,y=130)
 
         quit_btn = ctk.CTkButton(
@@ -57,7 +57,7 @@ class StartScreen(ctk.CTk):
         width=200,
         text="Quit",
         font=("opensans",50),
-        command=on_closing
+        command=lambda: sys.exit() 
         )
 
         quit_btn.place(x=280,y=210)
@@ -82,8 +82,8 @@ class StartScreen(ctk.CTk):
         )
         header.place(x=180,y=50)
         
-
-        self.protocol("WM_DELETE_WINDOW",on_closing)
+        
+        self.protocol("WM_DELETE_WINDOW",lambda: sys.exit())
 
 
         self.mainloop()
@@ -111,14 +111,22 @@ class Widgets(ctk.CTkFrame):
         self.max_font_size = max_font_size
         self.min_font_size = min_font_size
         self.font_art = "normal"
+        
+        
+        
+        
 
+        self.path = path
         self.text_color = "white"
         self.fg_color = background_color
         self.menu_func(window)
         self.create_textbox(window)
         self.create_counter(window)
+        
+        
+        
+        
 
-        self.path = path
 
         # button + icons für dateien
         self.text_icon = ctk.CTkImage(light_image=Image.open("assets/note.png"),size=(20,20))
@@ -148,7 +156,7 @@ class Widgets(ctk.CTkFrame):
 
         for i,line in enumerate(lines):
             count = self.counter.cget("text")
-
+            
 
             self.counter.configure(text=f"Lines: {i}")
 
@@ -168,6 +176,9 @@ class Widgets(ctk.CTkFrame):
         font=("opensans",15),
         image=final_icon,
         )
+
+
+
         
         self.update_icon()
         
@@ -183,7 +194,6 @@ class Widgets(ctk.CTkFrame):
         self.file_btn.configure(text=path[-1])
         self.path_len = len(path[-1])
         self.update_icon()
-
         
         
     def key_press(self,event):
@@ -222,19 +232,29 @@ class Widgets(ctk.CTkFrame):
 
     def create_counter(self,window):
 
-        info_frame = ctk.CTkFrame(window,width=140,height=20,corner_radius=0)
+        line_frame = ctk.CTkFrame(window,height=600,width=20,corner_radius=0)
+        
+        info_frame = ctk.CTkFrame(window,width=80,height=20,corner_radius=0)
         info_frame.place(x=0,y=28)
 
-        self.encoding = ctk.CTkLabel(info_frame,text="| utf-8",width=200,height=0)
-        self.encoding.place(x=10,y=3)
 
-        self.counter = ctk.CTkLabel(info_frame,text="Lines: 0",width=0,height=0)
+
+        self.encoding = ctk.CTkLabel(info_frame,text="| utf-8",width=200,height=0)
+       # self.encoding.place(x=10,y=3)
+
+        
+        
+        self.counter = ctk.CTkLabel(info_frame,text="Lines: 0",
+        width=0,
+        height=0,
+        font=(font,15)
+
+                                    )
         self.counter.place(x=2,y=3)
 
     def create_textbox(self,window):
 
         
-
         self.textbox = ctk.CTkTextbox(window,width=1920,height=1080,corner_radius=0,
         text_color=self.text_color,
         fg_color=self.fg_color,
@@ -245,6 +265,28 @@ class Widgets(ctk.CTkFrame):
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
 
+    def open_new_file(master) -> None:
+        try:
+                 new_window = ctk.CTkToplevel(master)
+                 new_window.geometry("800x600")
+                 new_file = filedialog.askopenfile(title="Open File",
+                 filetypes=[("Textdateien","*.txt",),
+                ("Python-Dateien","*.py"),
+                ("Markdown","*.md")]).name
+
+                 new_window.title(new_file)
+                 with open(new_file,"r") as file:
+                    content = file.read()
+                    
+                    text_widget = ctk.CTkTextbox(new_window,
+                    wrap=tk.WORD,
+                    width=1920,
+                    height=1080,
+                    font=(font,standard_font_size))
+                    text_widget.insert(tk.END, content)
+                    text_widget.place(x=0,y=0)
+        except Exception :
+            print("Closed new file window.")
 
     def write_preferences_to_json(self,main,key,new_value):
         try:
@@ -443,16 +485,31 @@ github @Moritz344 or if you need any help."""
                 self.update_textbox_font()
 
             def run_python_file() -> None:
-                with open(self.path,"r",encoding="utf-8") as file:
-                    content = file.read()
+
+                try:
+                    with open(self.path,"r",encoding="utf-8") as file:
+                        content = file.read()
+
+                    
 
                     try:
-                        subprocess.run(["python",self.path],
-                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+                        if sys.platform == "win32":
+                            subprocess.run(["python",self.path],
+                            creationflags=subprocess.CREATE_NEW_CONSOLE)
+                        else:
+                            subprocess.Popen(["x-terminal-emulator","-e","python3",self.path]) 
 
                     except Exception as e:
-                        print("Fehler beim Öffnen der Datei.",e)
+                        print("Fehler beim Öffnen des Terminals.",e)
 
+                except Exception:
+                    print("No Python file found")
+                    CTkMessagebox.CTkMessagebox(title="Warning",
+                    message="No Python file found",
+                    icon="warning",
+                    fade_in_duration=1,
+                    font=(font,20),
+                    )
 
             def open_recent_file() -> None:
 
@@ -482,8 +539,8 @@ github @Moritz344 or if you need any help."""
             
             # adding the menus
             menu.add_cascade(label="File", menu=fileMenu)
+            menu.add_cascade(label="Execute",menu=ausführenMenu)
             menu.add_cascade(label="Help",menu=helpMenu)
-            menu.add_cascade(label="Ausführen",menu=ausführenMenu)
             
 
             helpMenu.add_command(label="About",command=about_window)
@@ -493,7 +550,8 @@ github @Moritz344 or if you need any help."""
             
             fileMenu.add_command(label="Open",command=open_file )
             fileMenu.add_command(label="Save",command=save)
-            fileMenu.add_command(label="Save New File",command=save_file )
+            fileMenu.add_command(label="Open New File In Window",command=self.open_new_file)
+            fileMenu.add_command(label="Save File As",command=save_file )
             fileMenu.add_command(label="Exit",command=close_file)
             fileMenu.add_separator()
 
