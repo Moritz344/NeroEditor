@@ -12,8 +12,7 @@ from settings import *
 from tkinter import messagebox
 import json
 from PIL import Image,ImageTk
-
-# TODO: Ersetze Messageboxen
+import re
 
 
 
@@ -89,8 +88,41 @@ class StartScreen(ctk.CTk):
         self.mainloop()
 
 
+class SyntaxHighlighting:
+    def __init__(self,textbox,path):
         
+        self.textbox = textbox
+        self.path = path
+
+        self.textbox.tag_config("keyword",foreground=keyword)
+        self.textbox.tag_config("string",foreground=string)
+        self.textbox.tag_config("comment",foreground=comment)
+
+        self.textbox.tag_config("other1",foreground="#fb4934")
+        self.textbox.tag_config("other2",foreground="#b16286")
+       
+        self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+
+
+    def highlighting_syntax(self,event=None):
+        cursor_pos = self.textbox.index("insert")
+
+        keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
+        strings = r"(['\"])(?:(?=(\\?))\2.)*?\1"  
+        comments = r"#.*"  
+
+        other_1 = r"\b(def|return|except|try|class)\b"
+        other_2 = r"\b(print)\b"
         
+        text = self.textbox.get("1.0","end-1c")
+        
+        for pattern, tag in [(keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
+            for match in re.finditer(pattern, text):
+                start_idx = f"1.0 + {match.start()} chars"
+                end_idx = f"1.0 + {match.end()} chars"
+                self.textbox.tag_add(tag, start_idx, end_idx)
+
+        self.textbox.mark_set("insert", cursor_pos)
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -114,7 +146,7 @@ class Widgets(ctk.CTkFrame):
         
         
         
-        
+        self.current_filetype = None
 
         self.path = path
         self.text_color = "white"
@@ -142,7 +174,17 @@ class Widgets(ctk.CTkFrame):
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
 
+    
+            
+
         
+    def check_filetype(self):
+        if ".py" in self.path:
+            self.current_filetype = "Python File"
+        elif ".txt" in self.path:
+            self.current_filetype = "Textfile"
+
+        self.filetype_label.configure(text=f"| {self.current_filetype}")
 
     def update_icon(self):
         if ".py" in self.path:
@@ -195,6 +237,8 @@ class Widgets(ctk.CTkFrame):
         self.path_len = len(path[-1])
         self.update_icon()
         
+        SyntaxHighlighting(self.textbox,path[-1])
+        
         
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
@@ -234,15 +278,17 @@ class Widgets(ctk.CTkFrame):
 
         line_frame = ctk.CTkFrame(window,height=600,width=20,corner_radius=0)
         
-        info_frame = ctk.CTkFrame(window,width=80,height=20,corner_radius=0)
+        info_frame = ctk.CTkFrame(window,width=1920,height=20,corner_radius=0)
         info_frame.place(x=0,y=28)
 
 
+        self.filetype_label = ctk.CTkLabel(info_frame,
+        text=self.current_filetype,
+        width=0,
+        height=0,
+        font=(font,15))
 
-        self.encoding = ctk.CTkLabel(info_frame,text="| utf-8",width=200,height=0)
-       # self.encoding.place(x=10,y=3)
-
-        
+        self.filetype_label.place(x=100,y=3)
         
         self.counter = ctk.CTkLabel(info_frame,text="Lines: 0",
         width=0,
@@ -262,8 +308,10 @@ class Widgets(ctk.CTkFrame):
         font=(self.font,self.font_size,self.font_art))
         self.textbox.place(x=0,y=49)
 
+
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
+
 
     def open_new_file(master) -> None:
         try:
@@ -317,13 +365,14 @@ class Widgets(ctk.CTkFrame):
                 ("Markdown","*.md")]).name
                  if self.path:
                      self.used_files.append(self.path)
-                     self.update_file_name(self.path)
                      self.write_preferences_to_json("other","files",self.path)
+                     self.update_file_name(self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
                          content = file.read()
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                          self.count_lines()
+                         self.check_filetype()
                 except Exception as e:
                     print("please please please",e)
             def save():
@@ -525,6 +574,7 @@ github @Moritz344 or if you need any help."""
                     self.textbox.insert(1.0,content)
 
                     self.count_lines()
+                    self.check_filetype()
 
 
 
