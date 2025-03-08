@@ -16,7 +16,7 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 
 ![start_screen](https://github.com/user-attachments/assets/8ee5ac0d-bbbd-4794-a47e-04d02bc31389)
 
-![Screenshot_78](https://github.com/user-attachments/assets/5510c7cf-2f48-42f6-90c2-45f34a214b56)
+![Screenshot_91](https://github.com/user-attachments/assets/169bc672-afe7-4513-8610-186e91b0d6cc)
 
 
 </details>
