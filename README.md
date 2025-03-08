@@ -1,7 +1,7 @@
 # NeroEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
-NeroEditor is a simple and flexible text editor with basic features for editing text
+**NeroEditor** is a simple and flexible text editor with basic features for editing text.
 
 ![Screenshot_91](https://github.com/user-attachments/assets/169bc672-afe7-4513-8610-186e91b0d6cc)
 
