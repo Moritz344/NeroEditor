@@ -21,6 +21,7 @@
 </details>
 
 # Features
+- Basic Syntax Highlighting for Python
 - open text files,python files
 - save text file,python files
 - change font
@@ -33,6 +34,7 @@
 - Ctrl+y(redo)
 - line counter
 
+
 # Requirements
 - Python
 - tkinter
@@ -41,6 +43,7 @@
 - CTkListbox
 - CTkMessagebox
 - subprocess
+- re
 
 
 # Usage
