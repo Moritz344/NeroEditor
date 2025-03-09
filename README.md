@@ -1,10 +1,9 @@
 # NeroEditor
 [![Language](https://img.shields.io/badge/language-python-blue.svg?style=flat)](https://www.python.org) 
 
-NeroEditor is a simple and flexible text editor with basic features for editing text
+**NeroEditor** is a simple and flexible text editor with basic features for editing text.
 
-
-![GkNfigvXkAEkHH6](https://github.com/user-attachments/assets/5f7a76df-df6e-4c0a-a0e0-ba01e32ca6b8)
+![Screenshot_91](https://github.com/user-attachments/assets/169bc672-afe7-4513-8610-186e91b0d6cc)
 
 
 # How It Looks 👀
@@ -16,12 +15,13 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 
 ![start_screen](https://github.com/user-attachments/assets/8ee5ac0d-bbbd-4794-a47e-04d02bc31389)
 
-![Screenshot_78](https://github.com/user-attachments/assets/5510c7cf-2f48-42f6-90c2-45f34a214b56)
+![Screenshot_91](https://github.com/user-attachments/assets/169bc672-afe7-4513-8610-186e91b0d6cc)
 
 
 </details>
 
 # Features
+- Basic Syntax Highlighting for Python
 - open text files,python files
 - save text file,python files
 - change font
@@ -34,6 +34,7 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 - Ctrl+y(redo)
 - line counter
 
+
 # Requirements
 - Python
 - tkinter
@@ -42,6 +43,7 @@ NeroEditor is a simple and flexible text editor with basic features for editing 
 - CTkListbox
 - CTkMessagebox
 - subprocess
+- re
 
 
 # Usage
