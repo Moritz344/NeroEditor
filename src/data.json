@@ -10,13 +10,11 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Fahrzeug.py"
+        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Flugzeug.py"
     },
-   "syntax": {
-
-	   "strings": "#ebdbb2",
-	   "keyword": "#b8bb26",
-	   "comment": "#928374"
-
-   }
+    "syntax": {
+        "strings": "#ebdbb2",
+        "keyword": "#b8bb26",
+        "comment": "#928374"
+    }
 }

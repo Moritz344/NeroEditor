@@ -21,7 +21,7 @@ class App(ctk.CTk):
             title="Exit",
             option_1="No",
             option_2="Yes",
-            text_color="red",
+            text_color="white",
             message="Are you sure you saved your file?",
             fade_in_duration=0.5,
             font=(font,20),

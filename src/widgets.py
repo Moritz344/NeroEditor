@@ -13,8 +13,9 @@ from tkinter import messagebox
 import json
 from PIL import Image,ImageTk
 import re
+from CTkToolTip import *
 
-
+# Toplevel window speichern nach schließen
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -60,15 +61,16 @@ class StartScreen(ctk.CTk):
         )
 
         quit_btn.place(x=280,y=210)
-
         
-        github_icon = Image.open("assets/github_icon.png")
-        github_icon = github_icon.convert("RGBA")
+        def show_value():
+            print(tooltip_1.get())
+        self.github_icon = ctk.CTkImage(light_image=Image.open("assets/github_icon.png"),size=(50,50))
+        self.github_btn = ctk.CTkButton(self,text="",image=self.github_icon,fg_color="#212121",
+        width=100,height=20,
+        hover_color="#212121")
+        self.github_btn.place(x=10,y=540)
+        tooltip_1 = CTkToolTip(self.github_btn,delay=0.3,message="github.com/Moritz344")
 
-        photo = ctk.CTkImage(light_image=github_icon,size=(50,50))
-
-        label = ctk.CTkLabel(self,text="",image=photo)
-        label.place(x=10,y=540)
 
         header_frame.place(x=0,y=0)
         header = ctk.CTkLabel(
@@ -89,40 +91,66 @@ class StartScreen(ctk.CTk):
 
 
 class SyntaxHighlighting:
-    def __init__(self,textbox,path):
+    def __init__(self,textbox,filetype,fg_color,text_color):
         
         self.textbox = textbox
-        self.path = path
+        self.current_filetype = filetype
+        self.fg_color = fg_color
+        self.text_color = text_color
+        
+        if self.current_filetype == "Python File":
+            self.textbox.tag_config("keyword",foreground=keyword)
+            self.textbox.tag_config("string",foreground=string)
+            self.textbox.tag_config("comment",foreground=comment)
 
-        self.textbox.tag_config("keyword",foreground=keyword)
-        self.textbox.tag_config("string",foreground=string)
-        self.textbox.tag_config("comment",foreground=comment)
-
-        self.textbox.tag_config("other1",foreground="#fb4934")
-        self.textbox.tag_config("other2",foreground="#b16286")
+            self.textbox.tag_config("other1",foreground="#fb4934")
+            self.textbox.tag_config("other2",foreground="#b16286")
        
-        self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+        else:
+            self.change_colors()
 
+    def change_colors(self):
+        if self.fg_color == "#171614":
+            self.text_color = "white"
+            self.textbox.tag_config("keyword",foreground="white")
+            self.textbox.tag_config("string",foreground="white")
+            self.textbox.tag_config("comment",foreground="white")
+
+            self.textbox.tag_config("other1",foreground="white")
+            self.textbox.tag_config("other2",foreground="white")
+       
+            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+        elif self.fg_color == "white":
+            self.text_color = "black"
+            self.textbox.tag_config("keyword",foreground="black")
+            self.textbox.tag_config("string",foreground="black")
+            self.textbox.tag_config("comment",foreground="black")
+
+            self.textbox.tag_config("other1",foreground="black")
+            self.textbox.tag_config("other2",foreground="black")
+       
+            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
 
     def highlighting_syntax(self,event=None):
-        cursor_pos = self.textbox.index("insert")
+            cursor_pos = self.textbox.index("insert")
 
-        keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
-        strings = r"(['\"])(?:(?=(\\?))\2.)*?\1"  
-        comments = r"#.*"  
+            keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
+            strings = r"(['\"])(?:(?=(\\?))\2.)*?\1"  
+            comments = r"#.*"  
 
-        other_1 = r"\b(def|return|except|try|class)\b"
-        other_2 = r"\b(print)\b"
-        
-        text = self.textbox.get("1.0","end-1c")
-        
-        for pattern, tag in [(keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
-            for match in re.finditer(pattern, text):
-                start_idx = f"1.0 + {match.start()} chars"
-                end_idx = f"1.0 + {match.end()} chars"
-                self.textbox.tag_add(tag, start_idx, end_idx)
+            other_1 = r"\b(def|return|except|try|class)\b"
+            other_2 = r"\b(print)\b"
+            
+            text = self.textbox.get("1.0","end-1c")
+            
+            for pattern, tag in [(keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
+                for match in re.finditer(pattern, text):
+                    start_idx = f"1.0 + {match.start()} chars"
+                    end_idx = f"1.0 + {match.end()} chars"
+                    self.textbox.tag_add(tag, start_idx, end_idx)
 
-        self.textbox.mark_set("insert", cursor_pos)
+            self.textbox.mark_set("insert", cursor_pos)
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -184,6 +212,7 @@ class Widgets(ctk.CTkFrame):
         elif ".txt" in self.path:
             self.current_filetype = "Textfile"
 
+        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color)
         self.filetype_label.configure(text=f"| {self.current_filetype}")
 
     def update_icon(self):
@@ -237,7 +266,6 @@ class Widgets(ctk.CTkFrame):
         self.path_len = len(path[-1])
         self.update_icon()
         
-        SyntaxHighlighting(self.textbox,path[-1])
         
         
     def key_press(self,event):
@@ -313,7 +341,7 @@ class Widgets(ctk.CTkFrame):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
 
 
-    def open_new_file(master) -> None:
+    def open_new_file(master) -> None: 
         try:
                  new_window = ctk.CTkToplevel(master)
                  new_window.geometry("800x600")
