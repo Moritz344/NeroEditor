@@ -3,4 +3,5 @@ tkinter
 CTkListbox
 pillow
 CTkMessagebox
+CTkTooltip
 re
