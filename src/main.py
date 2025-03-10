@@ -11,6 +11,7 @@ class App(ctk.CTk):
         self.geometry("1000x600")
         self.minsize(1000,600)
         self.title(project_name)
+        self.configure(fg_color="#32373b")
 
 
 
@@ -39,7 +40,7 @@ class App(ctk.CTk):
         self.mainloop()
 
 
-StartScreen()
+#StartScreen()
 App()
 
 

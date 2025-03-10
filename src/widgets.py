@@ -14,8 +14,9 @@ import json
 from PIL import Image,ImageTk
 import re
 from CTkToolTip import *
+from CTkMenuBar import *
 
-# Toplevel window speichern nach schließen
+# TODO: Info Frame?
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -66,9 +67,9 @@ class StartScreen(ctk.CTk):
             print(tooltip_1.get())
         self.github_icon = ctk.CTkImage(light_image=Image.open("assets/github_icon.png"),size=(50,50))
         self.github_btn = ctk.CTkButton(self,text="",image=self.github_icon,fg_color="#212121",
-        width=100,height=20,
+        width=50,height=20,
         hover_color="#212121")
-        self.github_btn.place(x=10,y=540)
+        self.github_btn.place(x=0,y=540)
         tooltip_1 = CTkToolTip(self.github_btn,delay=0.3,message="github.com/Moritz344")
 
 
@@ -107,6 +108,7 @@ class SyntaxHighlighting:
             self.textbox.tag_config("other2",foreground="#b16286")
        
             self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+            self.textbox.bind("<Button-1>",self.highlighting_syntax)
         else:
             self.change_colors()
 
@@ -247,14 +249,8 @@ class Widgets(ctk.CTkFrame):
         font=("opensans",15),
         image=final_icon,
         )
-
-
-
-        
         self.update_icon()
-        
-
-        self.file_btn.place(x=0,y=0)
+        self.file_btn.place(x=0,y=30)
 
             
 
@@ -307,7 +303,7 @@ class Widgets(ctk.CTkFrame):
         line_frame = ctk.CTkFrame(window,height=600,width=20,corner_radius=0)
         
         info_frame = ctk.CTkFrame(window,width=1920,height=20,corner_radius=0)
-        info_frame.place(x=0,y=28)
+        #info_frame.place(x=0,y=58)
 
 
         self.filetype_label = ctk.CTkLabel(info_frame,
@@ -324,7 +320,7 @@ class Widgets(ctk.CTkFrame):
         font=(font,15)
 
                                     )
-        self.counter.place(x=2,y=3)
+        #self.counter.place(x=2,y=3)
 
     def create_textbox(self,window):
 
@@ -334,21 +330,23 @@ class Widgets(ctk.CTkFrame):
         fg_color=self.fg_color,
         undo=True,
         font=(self.font,self.font_size,self.font_art))
-        self.textbox.place(x=0,y=49)
+        self.textbox.place(x=0,y=60)
 
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
 
 
-    def open_new_file(master) -> None: 
-        try:
+    def open_new_file(master) : 
+            try:
                  new_window = ctk.CTkToplevel(master)
                  new_window.geometry("800x600")
+                    
                  new_file = filedialog.askopenfile(title="Open File",
                  filetypes=[("Textdateien","*.txt",),
                 ("Python-Dateien","*.py"),
                 ("Markdown","*.md")]).name
+
 
                  new_window.title(new_file)
                  with open(new_file,"r") as file:
@@ -361,8 +359,11 @@ class Widgets(ctk.CTkFrame):
                     font=(font,standard_font_size))
                     text_widget.insert(tk.END, content)
                     text_widget.place(x=0,y=0)
-        except Exception :
-            print("Closed new file window.")
+
+
+
+            except Exception as e:
+                print(e)
 
     def write_preferences_to_json(self,main,key,new_value):
         try:
@@ -525,6 +526,7 @@ class Widgets(ctk.CTkFrame):
                 root.title("About")
                 root.maxsize(650,300)
                 root.minsize(650,300)
+
                 
                 
                 text_list="""Thanks for using this app!
@@ -606,44 +608,82 @@ github @Moritz344 or if you need any help."""
 
 
 
-            menu = Menu(master)
-            master.configure(menu=menu)
+            menu = CTkMenuBar(master,bg_color="#171614",)
+            button_1 = menu.add_cascade("File")
+            button_2 = menu.add_cascade("Help")
+            button_3 = menu.add_cascade("Execute")
+            
+            dropdown_1 = CustomDropdownMenu(widget=button_1)
+            dropdown_1.add_option(option="Open",command=open_file)
+            dropdown_1.add_option(option="Save",command=save)
+            dropdown_1.add_option(option="Open New File In Window",
+            command=self.open_new_file)
+            dropdown_1.add_option(option="Save File As",command=save_file)
+            dropdown_1.add_option(option="Exit",command=close_file)
+
+            
+            # Recent File submenu
+            submenu_1 = dropdown_1.add_submenu("Recent File")
+            submenu_1.add_option(option=f"{files}",command=open_recent_file)
+
+            dropdown_2 = CustomDropdownMenu(widget=button_2)
+            dropdown_2.add_option(option="About")
+
+            dropdown_3 = CustomDropdownMenu(widget=button_3)
+            dropdown_3.add_option(option="Run Python Skript")
+
+            # Preference submenu
+            submenu_2 = dropdown_1.add_submenu("Preferences")
+            submenu_2.add_option(option="Font",command=update_font)
+            submenu_2.add_option(option="Colorscheme",command=change_colors)
+            submenu_2.add_option(option="Light mode",command=light_mode)
+            submenu_2.add_option(option="Dark mode",command=dark_mode)
+
+            dropdown_2 = CustomDropdownMenu(widget=button_2)
+            dropdown_2.add_option(option="About",command=about_window)
+
+            dropdown_3 = CustomDropdownMenu(widget=button_3)
+            dropdown_3.add_option(option="Run Python Script",
+            command=run_python_file)
+
+            #menu = Menu(master)
+            #master.configure(menu=menu)
 
     
-            fileMenu = Menu(menu,tearoff=False)
-            helpMenu = Menu(menu,tearoff=False)
-            ausführenMenu = Menu(menu,tearoff=False)
+            #fileMenu = Menu(menu,tearoff=False)
+            #helpMenu = Menu(menu,tearoff=False)
+            #ausführenMenu = Menu(menu,tearoff=False)
 
-            
-            # adding the menus
-            menu.add_cascade(label="File", menu=fileMenu)
-            menu.add_cascade(label="Execute",menu=ausführenMenu)
-            menu.add_cascade(label="Help",menu=helpMenu)
-            
+            #
+            ## adding the menus
+            #menu.add_cascade(label="File", menu=fileMenu)
+            #menu.add_cascade(label="Execute",menu=ausführenMenu)
+            #menu.add_cascade(label="Help",menu=helpMenu)
+            #
 
-            helpMenu.add_command(label="About",command=about_window)
+            #helpMenu.add_command(label="About",command=about_window)
 
-            ausführenMenu.add_command(label="Run Python Script",command=run_python_file)
-            
-            
-            fileMenu.add_command(label="Open",command=open_file )
-            fileMenu.add_command(label="Save",command=save)
-            fileMenu.add_command(label="Open New File In Window",command=self.open_new_file)
-            fileMenu.add_command(label="Save File As",command=save_file )
-            fileMenu.add_command(label="Exit",command=close_file)
-            fileMenu.add_separator()
+            #ausführenMenu.add_command(label="Run Python Script",command=run_python_file)
+            #
+            #
+            #fileMenu.add_command(label="Open",command=open_file )
+            #fileMenu.add_command(label="Save",command=save)
+            #fileMenu.add_command(label="Open New File In Window",command=self.open_new_file)
+            #fileMenu.add_command(label="Save File As",command=save_file )
+            #fileMenu.add_command(label="Exit",command=close_file)
+            #fileMenu.add_separator()
 
-            # sub menu
-            subMenu = Menu(fileMenu,tearoff=0)
-            fileMenu.add_cascade(label="Preferences",menu=subMenu)
-            subMenu.add_command(label="Font",command=update_font)
-            subMenu.add_command(label="Colorscheme",command=change_colors)
-            subMenu.add_command(label="Light mode",command=light_mode)
-            subMenu.add_command(label="Dark mode",command=dark_mode)
-            
-            RecentMenu = Menu(fileMenu,tearoff=0)
-            fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
-            RecentMenu.add_command(label=f"{files}",command=open_recent_file)
+            ## sub menu
+            #subMenu = Menu(fileMenu,tearoff=0)
+            #fileMenu.add_cascade(label="Preferences",menu=subMenu)
+            #subMenu.add_command(label="Font",command=update_font)
+            #subMenu.add_command(label="Colorscheme",command=change_colors)
+            #subMenu.add_command(label="Light mode",command=light_mode)
+            #subMenu.add_command(label="Dark mode",command=dark_mode)
+            #
+            #RecentMenu = Menu(fileMenu,tearoff=0)
+            #fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
+            #RecentMenu.add_command(label=f"{files}",command=open_recent_file)
  
 
 

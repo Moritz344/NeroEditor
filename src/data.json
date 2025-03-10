@@ -1,7 +1,7 @@
 {
     "preferences": {
-        "font": "Arial",
-        "colorscheme": "#171614"
+        "font": "Comic Sans MS",
+        "colorscheme": "#374b4a"
     },
     "other": {
         "standard_font_size": 25,
@@ -10,7 +10,7 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Flugzeug.py"
+        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Textdokument (neu).txt"
     },
     "syntax": {
         "strings": "#ebdbb2",
