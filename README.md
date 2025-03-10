@@ -42,8 +42,10 @@
 - sys
 - CTkListbox
 - CTkMessagebox
+- CTkToolTip
 - subprocess
 - re
+
 
 
 # Usage
