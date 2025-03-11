@@ -16,7 +16,8 @@ import re
 from CTkToolTip import *
 from CTkMenuBar import *
 
-# TODO: Info Frame?
+# TODO: Tab tree with tabs in ctk?
+# TODO: zip datei release
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -168,6 +169,8 @@ class Widgets(ctk.CTkFrame):
         
         self.textbox = None
         self.counter = None
+        self.filetype_label = None
+        self.info_window = None
 
         self.font_size = standard_font_size
         self.max_font_size = max_font_size
@@ -177,14 +180,14 @@ class Widgets(ctk.CTkFrame):
         
         
         self.current_filetype = None
+        self.current_lines = None
+        self.filesize = 0
 
         self.path = path
         self.text_color = "white"
         self.fg_color = background_color
         self.menu_func(window)
         self.create_textbox(window)
-        self.create_counter(window)
-        
         
         
         
@@ -214,8 +217,8 @@ class Widgets(ctk.CTkFrame):
         elif ".txt" in self.path:
             self.current_filetype = "Textfile"
 
+        #self.filetype_label.configure(text=f"{self.current_filetype}")
         SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color)
-        self.filetype_label.configure(text=f"| {self.current_filetype}")
 
     def update_icon(self):
         if ".py" in self.path:
@@ -228,10 +231,8 @@ class Widgets(ctk.CTkFrame):
         lines = content.split("\n")
 
         for i,line in enumerate(lines):
-            count = self.counter.cget("text")
+            self.current_lines = i
             
-
-            self.counter.configure(text=f"Lines: {i}")
 
 
 
@@ -298,29 +299,59 @@ class Widgets(ctk.CTkFrame):
         except Exception:
             print("nothing to redo")
 
-    def create_counter(self,window):
+    def file_info(self):
 
-        line_frame = ctk.CTkFrame(window,height=600,width=20,corner_radius=0)
-        
-        info_frame = ctk.CTkFrame(window,width=1920,height=20,corner_radius=0)
-        #info_frame.place(x=0,y=58)
 
+        self.info_window = ctk.CTkToplevel(self)
+        self.info_window.geometry("500x600")
+        self.info_window.title("File Info")
+
+
+        self.info_window.minsize(500,600)
+        self.info_window.maxsize(500,600)
+
+
+
+        info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
+        info_frame.place(x=0,y=0)
+
+
+
+
+
+        header = ctk.CTkLabel(info_frame,text="File Info",font=(font,40),)
+        header.place(x=160,y=5)
 
         self.filetype_label = ctk.CTkLabel(info_frame,
-        text=self.current_filetype,
+        text=f"Filetype: {self.current_filetype}",
         width=0,
         height=0,
         font=(font,15))
-
-        self.filetype_label.place(x=100,y=3)
         
-        self.counter = ctk.CTkLabel(info_frame,text="Lines: 0",
+        self.check_filetype()
+        self.filetype_label.place(x=10,y=110)
+
+        self.path_label = ctk.CTkLabel(info_frame,text=f"Path: {self.path}",font=(font,15))
+        self.path_label.place(x=10,y=140)
+        
+        try:
+            self.filesize = os.path.getsize(self.path)
+        except Exception:
+            pass
+
+
+        self.filesize = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=(font,15))
+        self.filesize.place(x=10,y=170)
+        
+        self.counter = ctk.CTkLabel(info_frame,text=f"Line: {self.current_lines}",
         width=0,
         height=0,
-        font=(font,15)
+        font=(font,15))
+        self.count_lines()
+        self.counter.place(x=10,y=80)
 
-                                    )
-        #self.counter.place(x=2,y=3)
+
+
 
     def create_textbox(self,window):
 
@@ -329,6 +360,7 @@ class Widgets(ctk.CTkFrame):
         text_color=self.text_color,
         fg_color=self.fg_color,
         undo=True,
+        wrap=None,
         font=(self.font,self.font_size,self.font_art))
         self.textbox.place(x=0,y=60)
 
@@ -602,7 +634,8 @@ github @Moritz344 or if you need any help."""
                     
                     self.textbox.delete(1.0,tk.END)
                     self.textbox.insert(1.0,content)
-
+                    
+                
                     self.count_lines()
                     self.check_filetype()
 
@@ -619,7 +652,8 @@ github @Moritz344 or if you need any help."""
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
             dropdown_1.add_option(option="Save File As",command=save_file)
-            dropdown_1.add_option(option="Exit",command=close_file)
+            
+            dropdown_1.add_option(option="File Info",command=self.file_info)
 
             
             # Recent File submenu
@@ -646,44 +680,9 @@ github @Moritz344 or if you need any help."""
             dropdown_3.add_option(option="Run Python Script",
             command=run_python_file)
 
-            #menu = Menu(master)
-            #master.configure(menu=menu)
 
-    
-            #fileMenu = Menu(menu,tearoff=False)
-            #helpMenu = Menu(menu,tearoff=False)
-            #ausführenMenu = Menu(menu,tearoff=False)
+            dropdown_1.add_option(option="Exit",command=close_file)
 
-            #
-            ## adding the menus
-            #menu.add_cascade(label="File", menu=fileMenu)
-            #menu.add_cascade(label="Execute",menu=ausführenMenu)
-            #menu.add_cascade(label="Help",menu=helpMenu)
-            #
-
-            #helpMenu.add_command(label="About",command=about_window)
-
-            #ausführenMenu.add_command(label="Run Python Script",command=run_python_file)
-            #
-            #
-            #fileMenu.add_command(label="Open",command=open_file )
-            #fileMenu.add_command(label="Save",command=save)
-            #fileMenu.add_command(label="Open New File In Window",command=self.open_new_file)
-            #fileMenu.add_command(label="Save File As",command=save_file )
-            #fileMenu.add_command(label="Exit",command=close_file)
-            #fileMenu.add_separator()
-
-            ## sub menu
-            #subMenu = Menu(fileMenu,tearoff=0)
-            #fileMenu.add_cascade(label="Preferences",menu=subMenu)
-            #subMenu.add_command(label="Font",command=update_font)
-            #subMenu.add_command(label="Colorscheme",command=change_colors)
-            #subMenu.add_command(label="Light mode",command=light_mode)
-            #subMenu.add_command(label="Dark mode",command=dark_mode)
-            #
-            #RecentMenu = Menu(fileMenu,tearoff=0)
-            #fileMenu.add_cascade(label="Recent File",menu=RecentMenu)
-            #RecentMenu.add_command(label=f"{files}",command=open_recent_file)
  
 
 

@@ -1,6 +1,6 @@
 {
     "preferences": {
-        "font": "Comic Sans MS",
+        "font": "Arial",
         "colorscheme": "#374b4a"
     },
     "other": {
@@ -10,11 +10,11 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Textdokument (neu).txt"
+        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Tiere.py"
     },
     "syntax": {
         "strings": "#ebdbb2",
         "keyword": "#b8bb26",
-        "comment": "#928374"
+        "comment": "grey"
     }
 }
