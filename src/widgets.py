@@ -16,7 +16,7 @@ import re
 from CTkToolTip import *
 from CTkMenuBar import *
 
-# TODO: Tab tree with tabs in ctk?
+# TODO: testing/filetree.py hier implementieren vermutlich rechts ein frame mit dem tree
 # TODO: zip datei release
 
 class StartScreen(ctk.CTk):
@@ -249,6 +249,7 @@ class Widgets(ctk.CTkFrame):
         self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#32373b",
         font=("opensans",15),
         image=final_icon,
+        hover_color="#32373b",
         )
         self.update_icon()
         self.file_btn.place(x=0,y=30)
@@ -303,12 +304,12 @@ class Widgets(ctk.CTkFrame):
 
 
         self.info_window = ctk.CTkToplevel(self)
-        self.info_window.geometry("500x600")
+        self.info_window.geometry("500x300")
         self.info_window.title("File Info")
 
 
-        self.info_window.minsize(500,600)
-        self.info_window.maxsize(500,600)
+        self.info_window.minsize(500,300)
+        self.info_window.maxsize(500,300)
 
 
 
@@ -320,19 +321,24 @@ class Widgets(ctk.CTkFrame):
 
 
         header = ctk.CTkLabel(info_frame,text="File Info",font=(font,40),)
-        header.place(x=160,y=5)
+        header.place(x=180,y=5)
 
         self.filetype_label = ctk.CTkLabel(info_frame,
         text=f"Filetype: {self.current_filetype}",
         width=0,
         height=0,
-        font=(font,15))
+        font=(font,standard_font_size))
         
         self.check_filetype()
         self.filetype_label.place(x=10,y=110)
 
-        self.path_label = ctk.CTkLabel(info_frame,text=f"Path: {self.path}",font=(font,15))
+        
+        self.path_name = self.path.split("/")
+        self.path_label = ctk.CTkLabel(info_frame,
+        text=f"Path: {self.path_name[-1]}",
+        font=(font,standard_font_size))
         self.path_label.place(x=10,y=140)
+
         
         try:
             self.filesize = os.path.getsize(self.path)
@@ -340,17 +346,25 @@ class Widgets(ctk.CTkFrame):
             pass
 
 
-        self.filesize = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=(font,15))
-        self.filesize.place(x=10,y=170)
+        self.filesize_label = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=(font,standard_font_size))
+        self.filesize_label.place(x=10,y=170)
         
-        self.counter = ctk.CTkLabel(info_frame,text=f"Line: {self.current_lines}",
+        self.counter = ctk.CTkLabel(info_frame,text=f"Lines: {self.current_lines}",
         width=0,
         height=0,
-        font=(font,15))
+        font=(font,standard_font_size))
         self.count_lines()
         self.counter.place(x=10,y=80)
 
 
+        tooltip_1 = CTkToolTip(self.path_label,message=f"{self.path}")
+        tooltip_2 = CTkToolTip(self.filetype_label,
+        message=f"{self.current_filetype}")
+
+        tooltip_3 = CTkToolTip(self.filesize_label,
+        message=f"{self.filesize}B (that's massive)")
+        tooltip_4 = CTkToolTip(self.counter,
+        message=f"{self.current_lines}")
 
 
     def create_textbox(self,window):
@@ -375,10 +389,13 @@ class Widgets(ctk.CTkFrame):
                  new_window.geometry("800x600")
                     
                  new_file = filedialog.askopenfile(title="Open File",
-                 filetypes=[("Textdateien","*.txt",),
+                 filetypes=[("Alle Dateien","*.*"),
+                ("Textdateien","*.txt"),
                 ("Python-Dateien","*.py"),
-                ("Markdown","*.md")]).name
-
+                ("Markdown","*.md"),
+                ("HTML-Dateien","*.html"),
+                ("PDF-Dokumente","*.pdf"),
+                ("CSV-Dateien","*.csv")]).name
 
                  new_window.title(new_file)
                  with open(new_file,"r") as file:
@@ -421,9 +438,14 @@ class Widgets(ctk.CTkFrame):
                 try:
                  # file path
                  self.path = filedialog.askopenfile(title="Open File",
-                 filetypes=[("Textdateien","*.txt",),
+                 filetypes=[("Alle Dateien","*.*"),
+                ("Textdateien","*.txt",),
                 ("Python-Dateien","*.py"),
-                ("Markdown","*.md")]).name
+                ("Markdown","*.md"),
+                ("HTML-Dateien","*.html"),
+                ("PDF-Dokumente","*.pdf"),
+                ("CSV-Dateien","*.csv")
+                ]).name
                  if self.path:
                      self.used_files.append(self.path)
                      self.write_preferences_to_json("other","files",self.path)
@@ -553,7 +575,7 @@ class Widgets(ctk.CTkFrame):
                 root.mainloop()
 
             def about_window():
-                root = ctk.CTk()
+                root = ctk.CTkToplevel(self)
                 root.geometry("650x300")
                 root.title("About")
                 root.maxsize(650,300)
@@ -585,7 +607,6 @@ github @Moritz344 or if you need any help."""
                 normal_text.configure(state="disabled")
                 normal_text.place(x=0,y=0)
 
-                root.mainloop()
             def light_mode():
                 self.fg_color = "white"
                 self.text_color = "black"
