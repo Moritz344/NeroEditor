@@ -17,7 +17,6 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 
-# TODO: testing/filetree.py hier implementieren vermutlich rechts ein frame mit dem tree
 # TODO: zip datei release
 
 class StartScreen(ctk.CTk):
