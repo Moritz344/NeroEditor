@@ -15,6 +15,7 @@ from PIL import Image,ImageTk
 import re
 from CTkToolTip import *
 from CTkMenuBar import *
+from CTkScrollableDropdown import *
 
 # TODO: testing/filetree.py hier implementieren vermutlich rechts ein frame mit dem tree
 # TODO: zip datei release
@@ -90,6 +91,7 @@ class StartScreen(ctk.CTk):
 
 
         self.mainloop()
+
 
 
 class SyntaxHighlighting:
@@ -320,14 +322,14 @@ class Widgets(ctk.CTkFrame):
 
 
 
-        header = ctk.CTkLabel(info_frame,text="File Info",font=(font,40),)
+        header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
         header.place(x=180,y=5)
 
         self.filetype_label = ctk.CTkLabel(info_frame,
         text=f"Filetype: {self.current_filetype}",
         width=0,
         height=0,
-        font=(font,standard_font_size))
+        font=("opensans",standard_font_size))
         
         self.check_filetype()
         self.filetype_label.place(x=10,y=110)
@@ -336,7 +338,7 @@ class Widgets(ctk.CTkFrame):
         self.path_name = self.path.split("/")
         self.path_label = ctk.CTkLabel(info_frame,
         text=f"Path: {self.path_name[-1]}",
-        font=(font,standard_font_size))
+        font=("opensans",standard_font_size))
         self.path_label.place(x=10,y=140)
 
         
@@ -346,13 +348,13 @@ class Widgets(ctk.CTkFrame):
             pass
 
 
-        self.filesize_label = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=(font,standard_font_size))
+        self.filesize_label = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=("opensans",standard_font_size))
         self.filesize_label.place(x=10,y=170)
         
         self.counter = ctk.CTkLabel(info_frame,text=f"Lines: {self.current_lines}",
         width=0,
         height=0,
-        font=(font,standard_font_size))
+        font=("opensans",standard_font_size))
         self.count_lines()
         self.counter.place(x=10,y=80)
 
@@ -487,13 +489,31 @@ class Widgets(ctk.CTkFrame):
 
             def close_file():
                 sys.exit(0)
-            def change_colors():
-                root = ctk.CTk()
-                root.title("Colorschemes")
-                root.minsize(200,200)
-                root.maxsize(200,200)
 
-                def change_selected(selected):
+            def update_preferences():
+                root = ctk.CTkToplevel(self)
+                root.title("Preferences")
+                root.geometry("300x200")
+
+                root.minsize(300,200)
+                root.maxsize(300,200)
+
+                header = ctk.CTkLabel(root,text="Preferences",font=("opensans",30)).place(x=70,y=5)
+
+
+                def change_font(selected):
+                    self.font = selected
+                    self.write_preferences_to_json("preferences","font",selected)
+                    self.update_textbox_font()
+
+                values = ["Comic Sans MS","Arial","opensans",]
+
+                optionmenu_1= ctk.CTkOptionMenu(root,width=240)
+                optionmenu_1.set("Font")
+                optionmenu_1.place(x=25,y=70)
+
+
+                def change_bg(selected):
                     if selected == "Dark Slate Grey":
                         self.fg_color = "#374b4a"
                         self.update_textbox_font()
@@ -514,65 +534,16 @@ class Widgets(ctk.CTkFrame):
 
 
 
-
-
-
-                colorschemes = CTkListbox(
-                master=root,
-                width=170,
-                height=183,
-                command=change_selected,
-                border_width=0,
-                fg_color=background_color,
-                scrollbar_button_color=background_color,
-                scrollbar_button_hover_color=background_color
-
-                )
-                colorschemes.place(x=5,y=0)
-
-                colorschemes.insert(4,"Dark Slate Grey")
-                colorschemes.insert(3,"Pumpkin")
-                colorschemes.insert(2,"Vermilton")
-                colorschemes.insert(0,"Last Used")
-                colorschemes.insert(1,"Standard")
-
-                root.mainloop()
-            
+                optionmenu_2 = ctk.CTkOptionMenu(root,width=240)
+                optionmenu_2.place(x=25,y=120)
+                optionmenu_2.set("BG color")
                 
+                bg_colors = ["Dark Slate Grey","Pumpkin","Vermilton","Last Used","Standard"]
 
-            def update_font():
-                root = ctk.CTk()
-                root.title("Font")
-                root.geometry("190x230")
-                root.maxsize(190,230)
-                root.minsize(190,230)
-
-                def change_font(selected):
-                    self.font = selected
-                    self.write_preferences_to_json("preferences","font",selected)
-                    self.update_textbox_font()
-
-                listbox = CTkListbox(root,
-                height=200,
-                command=change_font,
-                border_width=0,
-                fg_color=background_color,
-                scrollbar_button_color=background_color,
-                scrollbar_button_hover_color=background_color
-
-                )
-                listbox.place(x=10,y=10)
-                listbox.insert(0,"opensans")
-                listbox.insert(1,"Arial")
-                listbox.insert(2,"Times New Roman")
-                listbox.insert(3,"Bahnschrift")
-                listbox.insert(4,"Calibri")
-                listbox.insert(5,"Cambria")
-                listbox.insert(6,"Comic Sans MS")
-                listbox.insert("END","chiller")
+                CTkScrollableDropdown(optionmenu_1,values=values,command=change_font)
+                CTkScrollableDropdown(optionmenu_2,values=bg_colors,command=change_bg)
 
 
-                root.mainloop()
 
             def about_window():
                 root = ctk.CTkToplevel(self)
@@ -616,6 +587,7 @@ github @Moritz344 or if you need any help."""
                 self.text_color = "white"
                 self.update_textbox_font()
 
+
             def run_python_file() -> None:
 
                 try:
@@ -640,7 +612,7 @@ github @Moritz344 or if you need any help."""
                     message="No Python file found",
                     icon="warning",
                     fade_in_duration=1,
-                    font=(font,20),
+                    font=("opensans",20),
                     )
 
             def open_recent_file() -> None:
@@ -662,8 +634,9 @@ github @Moritz344 or if you need any help."""
 
 
 
-            menu = CTkMenuBar(master,bg_color="#171614",)
+            menu = CTkMenuBar(master,bg_color="#171614")
             button_1 = menu.add_cascade("File")
+            button_4 = menu.add_cascade("Settings")
             button_2 = menu.add_cascade("Help")
             button_3 = menu.add_cascade("Execute")
             
@@ -674,7 +647,6 @@ github @Moritz344 or if you need any help."""
             command=self.open_new_file)
             dropdown_1.add_option(option="Save File As",command=save_file)
             
-            dropdown_1.add_option(option="File Info",command=self.file_info)
 
             
             # Recent File submenu
@@ -688,11 +660,6 @@ github @Moritz344 or if you need any help."""
             dropdown_3.add_option(option="Run Python Skript")
 
             # Preference submenu
-            submenu_2 = dropdown_1.add_submenu("Preferences")
-            submenu_2.add_option(option="Font",command=update_font)
-            submenu_2.add_option(option="Colorscheme",command=change_colors)
-            submenu_2.add_option(option="Light mode",command=light_mode)
-            submenu_2.add_option(option="Dark mode",command=dark_mode)
 
             dropdown_2 = CustomDropdownMenu(widget=button_2)
             dropdown_2.add_option(option="About",command=about_window)
@@ -700,6 +667,15 @@ github @Moritz344 or if you need any help."""
             dropdown_3 = CustomDropdownMenu(widget=button_3)
             dropdown_3.add_option(option="Run Python Script",
             command=run_python_file)
+
+            dropdown_4 = CustomDropdownMenu(widget=button_4)
+
+            dropdown_4.add_option(option="File Info",command=self.file_info)
+
+            submenu_2 = dropdown_4.add_submenu("Preferences")
+            submenu_2.add_option(option="Open Preferences Window",command=update_preferences)
+            submenu_2.add_option(option="Light mode",command=light_mode)
+            submenu_2.add_option(option="Dark mode",command=dark_mode)
 
 
             dropdown_1.add_option(option="Exit",command=close_file)

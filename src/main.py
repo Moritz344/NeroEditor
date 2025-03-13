@@ -7,7 +7,7 @@ from settings import project_name
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        ctk.set_appearance_mode("system")
+        ctk.set_appearance_mode("dark")
         self.geometry("1000x600")
         self.minsize(1000,600)
         self.title(project_name)
@@ -25,7 +25,7 @@ class App(ctk.CTk):
             text_color="white",
             message="Are you sure you saved your file?",
             fade_in_duration=0.5,
-            font=(font,20),
+            font=("opensans",20),
                     )
             response = msg.get()
             if response == "Yes":
@@ -40,7 +40,7 @@ class App(ctk.CTk):
         self.mainloop()
 
 
-StartScreen() # wird auskommentiert für debug zwecken
+#StartScreen() # wird auskommentiert für debug zwecken
 App()
 
 
