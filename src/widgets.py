@@ -17,7 +17,7 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 
-# TODO: testing/filetree.py hier implementieren vermutlich rechts ein frame mit dem tree
+# TODO: more tooltips,more messagebox
 # TODO: zip datei release
 
 class StartScreen(ctk.CTk):
@@ -114,6 +114,9 @@ class SyntaxHighlighting:
             self.textbox.bind("<Button-1>",self.highlighting_syntax)
         else:
             self.change_colors()
+        
+        self.textbox.bind("<KeyRelease>",self.autocompletion)
+        self.textbox.bind("<KeyPress>",self.autocompletion)
 
     def change_colors(self):
         if self.fg_color == "#171614":
@@ -137,10 +140,46 @@ class SyntaxHighlighting:
        
             self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
 
+    def autocompletion(self,event=None):
+
+            pos = self.textbox.index("insert")
+            text = self.textbox.get("1.0",pos)
+            prev_char = self.textbox.get(pos + "-1c",pos)
+
+
+            if prev_char  == '(' :
+                if event.keysym not in("BackSpace","Delete","Caps_Lock","Right","Left"):
+                    self.textbox.insert(pos,')')
+                    self.textbox.mark_set("insert", pos)
+                if event.keysym in ("BackSpace","Delete"):
+                    self.textbox.delete(pos + "-1c" ,pos)
+            elif prev_char  == '{' :
+                if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                    if event.type != tk.EventType.KeyPress:
+                        self.textbox.insert(pos,'}')
+                        self.textbox.mark_set("insert", pos)
+                if event.keysym in ("BackSpace","Delete"):
+                    self.textbox.delete(pos + "-1c" ,pos)
+            elif prev_char == '[':
+                if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                    if event.type != tk.EventType.KeyPress:
+                        self.textbox.insert(pos,']')
+                        self.textbox.mark_set("insert", pos)
+                if event.keysym in ("BackSpace","Delete"):
+                    self.textbox.delete(pos + "-1c" ,pos)
+            elif prev_char == '"':
+                if event.keysym not in("Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                    if event.type != tk.EventType.KeyPress:
+                        self.textbox.insert(pos,'"')
+                        self.textbox.mark_set("insert", pos)
+                if event.keysym in ("BackSpace","Delete"):
+                    self.textbox.delete(pos + "-1c" ,pos)
+
+
     def highlighting_syntax(self,event=None):
             cursor_pos = self.textbox.index("insert")
 
-            keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
+            self.keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
             strings = r"(['\"])(?:(?=(\\?))\2.)*?\1"  
             comments = r"#.*"  
 
@@ -149,10 +188,11 @@ class SyntaxHighlighting:
             
             text = self.textbox.get("1.0","end-1c")
             
-            for pattern, tag in [(keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
+            for pattern, tag in [(self.keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
                 for match in re.finditer(pattern, text):
                     start_idx = f"1.0 + {match.start()} chars"
                     end_idx = f"1.0 + {match.end()} chars"
+
                     self.textbox.tag_add(tag, start_idx, end_idx)
 
             self.textbox.mark_set("insert", cursor_pos)
@@ -377,9 +417,12 @@ class Widgets(ctk.CTkFrame):
         fg_color=self.fg_color,
         undo=True,
         wrap=None,
+        tabs=(30),
+        cursor="ibeam",
+        border_spacing=2,
         font=(self.font,self.font_size,self.font_art))
         self.textbox.place(x=0,y=60)
-
+        
 
     def update_textbox_font(self):
         self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
@@ -449,7 +492,7 @@ class Widgets(ctk.CTkFrame):
                 ("CSV-Dateien","*.csv")
                 ]).name
                  if self.path:
-                     self.used_files.append(self.path)
+                     #self.used_files.append(self.path)
                      self.write_preferences_to_json("other","files",self.path)
                      self.update_file_name(self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
@@ -466,8 +509,8 @@ class Widgets(ctk.CTkFrame):
                         content = self.textbox.get(1.0,tk.END)
                         file.write(content)
                         
-                except Exception :
-                    print("oof")
+                except Exception as e:
+                    print("oof",e)
                 
             def save_file():
                 try:
@@ -586,6 +629,44 @@ github @Moritz344 or if you need any help."""
                 self.fg_color = "#171614"
                 self.text_color = "white"
                 self.update_textbox_font()
+            
+            def new_file():
+                file_path = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Textdateien", "*.txt"), ("Alle Dateien", "*.*")])
+
+
+                if file_path:
+                    with open(file_path,"w+") as file:
+                        file_content = file.read()
+                        self.path = file_path
+                        self.update_file_name(self.path)
+
+
+                        self.textbox.delete("1.0",tk.END)
+                        self.textbox.insert(tk.END,file_content)
+
+                        msg =CTkMessagebox.CTkMessagebox(
+                            self,
+                            icon="check",
+                            title="New File",
+                            option_1="Ok",
+                            text_color="white",
+                            message=f"Your file got created sucessfuly in: {file_path}",
+                            fade_in_duration=0.5,
+                            font=("opensans",20),)
+
+                        msg.geometry("+500+300")
+
+                        self.write_preferences_to_json("other","files",self.path)
+                        self.update_file_name(self.path)
+                        self.count_lines()
+                        self.check_filetype()
+
+
+
+
+
 
 
             def run_python_file() -> None:
@@ -642,7 +723,8 @@ github @Moritz344 or if you need any help."""
             
             dropdown_1 = CustomDropdownMenu(widget=button_1)
             dropdown_1.add_option(option="Open",command=open_file)
-            dropdown_1.add_option(option="Save",command=save)
+            dropdown_1.add_option(option="Create New",command=new_file)
+            dropdown_1.add_option(option="Save Current ",command=save)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
             dropdown_1.add_option(option="Save File As",command=save_file)
