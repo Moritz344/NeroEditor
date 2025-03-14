@@ -35,7 +35,7 @@
 
 
 # Requirements
-- Python
+- Python 3.11
 - tkinter
 - customtkinter
 - sys
