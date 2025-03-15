@@ -38,11 +38,10 @@
 - Python 3.11
 - tkinter
 - customtkinter
-- sys
 - CTkListbox
 - CTkMessagebox
 - CTkToolTip
-- subprocess
+
 
 
 # Usage
