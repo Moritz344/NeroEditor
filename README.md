@@ -43,8 +43,6 @@
 - CTkMessagebox
 - CTkToolTip
 - subprocess
-- re
-
 
 
 # Usage
