@@ -35,15 +35,12 @@
 
 
 # Requirements
-- Python
+- Python 3.11
 - tkinter
 - customtkinter
-- sys
 - CTkListbox
 - CTkMessagebox
 - CTkToolTip
-- subprocess
-- re
 
 
 
@@ -63,6 +60,4 @@ If you want to test the app, you'll need to build it from the source code.
 
 # Author
 - Moritz344
-  
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W61324M0)
 

@@ -4,4 +4,3 @@ CTkListbox
 pillow
 CTkMessagebox
 CTkTooltip
-re
