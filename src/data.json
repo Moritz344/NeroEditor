@@ -1,7 +1,7 @@
 {
     "preferences": {
-        "font": "Arial",
-        "colorscheme": "#374b4a"
+        "font": "opensans",
+        "colorscheme": "#171614"
     },
     "other": {
         "standard_font_size": 25,
@@ -10,7 +10,53 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "//wsl.localhost/Ubuntu/root/dev/Informatik-Schule/Tiere.py"
+        "files": "C:/Users/tmaie/dev/tkinter/apps/NeroEditor/src/assets/icons-Info.txt",
+        "datatypes": [
+            [
+                "Alle-Dateien",
+                "*.*"
+            ],
+            [
+                "Textdateien",
+                "*.txt"
+            ],
+            [
+                "Python-Dateien",
+                "*.py"
+            ],
+            [
+                "Javascript-Dateien",
+                "*.js"
+            ],
+            [
+                "JSON-Dateien",
+                "*.json"
+            ],
+            [
+                "CSV-Dateien",
+                "*.csv"
+            ],
+            [
+                "CSS-Dateien",
+                "*.css"
+            ],
+            [
+                "PDF-Dateien",
+                "*.pdf"
+            ],
+            [
+                "HTML-Dateien",
+                "*.html"
+            ],
+            [
+                "LaTex-Dateien",
+                "*.text"
+            ],
+            [
+                "SQL-Dateien",
+                "*.sql"
+            ]
+        ]
     },
     "syntax": {
         "strings": "#ebdbb2",

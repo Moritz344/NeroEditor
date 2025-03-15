@@ -17,8 +17,9 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 
-# TODO: more tooltips,more messagebox
+# TODO: more tooltips,more messagebox,more icons?
 # TODO: zip datei release
+
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -96,13 +97,13 @@ class StartScreen(ctk.CTk):
 
 class SyntaxHighlighting:
     def __init__(self,textbox,filetype,fg_color,text_color):
-        
+       
         self.textbox = textbox
         self.current_filetype = filetype
         self.fg_color = fg_color
         self.text_color = text_color
         
-        if self.current_filetype == "Python File":
+        if self.current_filetype == "Python ":
             self.textbox.tag_config("keyword",foreground=keyword)
             self.textbox.tag_config("string",foreground=string)
             self.textbox.tag_config("comment",foreground=comment)
@@ -232,13 +233,17 @@ class Widgets(ctk.CTkFrame):
         self.create_textbox(window)
         
         
-        
 
 
         # button + icons für dateien
         self.text_icon = ctk.CTkImage(light_image=Image.open("assets/note.png"),size=(20,20))
         self.final_icon = self.text_icon
         self.python_icon = ctk.CTkImage(light_image=Image.open("assets/python_icon.png"),size=(20,20))
+        self.html_icon = ctk.CTkImage(light_image=Image.open("assets/html.png"),size=(20,20))
+        self.json_icon = ctk.CTkImage(light_image=Image.open("assets/json.png"),size=(20,20))
+        self.javascript_icon = ctk.CTkImage(light_image=Image.open("assets/js.png"),size=(20,20))
+        self.css_icon = ctk.CTkImage(light_image=Image.open("assets/css.png"),size=(20,20))
+        self.csv_icon = ctk.CTkImage(light_image=Image.open("assets/csv.png"),size=(20,20))
         self.file_name(window,self.path,self.final_icon)
 
 
@@ -253,20 +258,31 @@ class Widgets(ctk.CTkFrame):
             
 
         
-    def check_filetype(self):
-        if ".py" in self.path:
-            self.current_filetype = "Python File"
-        elif ".txt" in self.path:
-            self.current_filetype = "Textfile"
-
-        #self.filetype_label.configure(text=f"{self.current_filetype}")
-        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color)
 
     def update_icon(self):
-        if ".py" in self.path:
+        self.path_end = self.path.split(".")
+        if self.path_end[-1] == "py":
             self.file_btn.configure(image=self.python_icon)
+            self.current_filetype = "Python "
+        elif self.path_end[-1] == "html":
+            self.file_btn.configure(image=self.html_icon)
+            self.current_filetype = "HTML "
+        elif self.path_end[-1] == "js":
+            self.file_btn.configure(image=self.javascript_icon)
+            self.current_filetype = "Javascript "
+        elif self.path_end[-1] == "css":
+            self.file_btn.configure(image=self.css_icon)
+            self.current_filetype = "CSS "
+        elif self.path_end[-1] == "json":
+            self.file_btn.configure(image=self.json_icon)
+            self.current_filetype = "JSON "
+        elif self.path_end[-1] == "csv":
+            self.current_filetype = "CSV "
+            self.file_btn.configure(image=self.csv_icon)
         else:
+            self.current_filetype = "Textfile"
             self.file_btn.configure(image=self.text_icon)
+
 
     def count_lines(self):
         content = self.textbox.get("1.0","end")
@@ -305,6 +321,7 @@ class Widgets(ctk.CTkFrame):
         self.file_btn.configure(text=path[-1])
         self.path_len = len(path[-1])
         self.update_icon()
+        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color)
         
         
         
@@ -342,6 +359,9 @@ class Widgets(ctk.CTkFrame):
         except Exception:
             print("nothing to redo")
 
+    def settings(self):
+        pass
+
     def file_info(self):
 
 
@@ -358,12 +378,12 @@ class Widgets(ctk.CTkFrame):
         info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
         info_frame.place(x=0,y=0)
 
-
-
-
+        icon = ctk.CTkLabel(info_frame,text="Icons by Flaticon",font=("opensans",15))
+        icon.place(x=360,y=270)
 
         header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
         header.place(x=180,y=5)
+
 
         self.filetype_label = ctk.CTkLabel(info_frame,
         text=f"Filetype: {self.current_filetype}",
@@ -371,7 +391,6 @@ class Widgets(ctk.CTkFrame):
         height=0,
         font=("opensans",standard_font_size))
         
-        self.check_filetype()
         self.filetype_label.place(x=10,y=110)
 
         
@@ -434,13 +453,7 @@ class Widgets(ctk.CTkFrame):
                  new_window.geometry("800x600")
                     
                  new_file = filedialog.askopenfile(title="Open File",
-                 filetypes=[("Alle Dateien","*.*"),
-                ("Textdateien","*.txt"),
-                ("Python-Dateien","*.py"),
-                ("Markdown","*.md"),
-                ("HTML-Dateien","*.html"),
-                ("PDF-Dokumente","*.pdf"),
-                ("CSV-Dateien","*.csv")]).name
+                 filetypes=datatypes).name
 
                  new_window.title(new_file)
                  with open(new_file,"r") as file:
@@ -483,14 +496,7 @@ class Widgets(ctk.CTkFrame):
                 try:
                  # file path
                  self.path = filedialog.askopenfile(title="Open File",
-                 filetypes=[("Alle Dateien","*.*"),
-                ("Textdateien","*.txt",),
-                ("Python-Dateien","*.py"),
-                ("Markdown","*.md"),
-                ("HTML-Dateien","*.html"),
-                ("PDF-Dokumente","*.pdf"),
-                ("CSV-Dateien","*.csv")
-                ]).name
+                 filetypes=datatypes).name
                  if self.path:
                      #self.used_files.append(self.path)
                      self.write_preferences_to_json("other","files",self.path)
@@ -500,7 +506,6 @@ class Widgets(ctk.CTkFrame):
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                          self.count_lines()
-                         self.check_filetype()
                 except Exception as e:
                     print("please please please",e)
             def save():
@@ -514,12 +519,9 @@ class Widgets(ctk.CTkFrame):
                 
             def save_file():
                 try:
-                    self.path = filedialog.asksaveasfile(title="Save File",filetypes=
-                    [("Textdateien","*.txt"),
-                    ("Python-Dateien","*.py"),
-                    ("Markdown-Dateien","*.md")]).name
+                    self.path = filedialog.asksaveasfile(title="Save File",
+                    filetypes=datatypes).name
 
-                
                     if self.path:
                         self.update_file_name(self.path)
                         with open(self.path,"w",encoding="utf-8") as file:
@@ -633,7 +635,7 @@ github @Moritz344 or if you need any help."""
             def new_file():
                 file_path = filedialog.asksaveasfilename(
                 defaultextension=".txt",
-                filetypes=[("Textdateien", "*.txt"), ("Alle Dateien", "*.*")])
+                filetypes=datatypes)
 
 
                 if file_path:
@@ -653,7 +655,6 @@ github @Moritz344 or if you need any help."""
                             option_1="Ok",
                             text_color="white",
                             message=f"Your file got created sucessfuly in: {file_path}",
-                            fade_in_duration=0.5,
                             font=("opensans",20),)
 
                         msg.geometry("+500+300")
@@ -661,7 +662,6 @@ github @Moritz344 or if you need any help."""
                         self.write_preferences_to_json("other","files",self.path)
                         self.update_file_name(self.path)
                         self.count_lines()
-                        self.check_filetype()
 
 
 
@@ -711,7 +711,6 @@ github @Moritz344 or if you need any help."""
                     
                 
                     self.count_lines()
-                    self.check_filetype()
 
 
 
@@ -724,7 +723,7 @@ github @Moritz344 or if you need any help."""
             dropdown_1 = CustomDropdownMenu(widget=button_1)
             dropdown_1.add_option(option="Open",command=open_file)
             dropdown_1.add_option(option="Create New",command=new_file)
-            dropdown_1.add_option(option="Save Current ",command=save)
+            dropdown_1.add_option(option="Save ",command=save)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
             dropdown_1.add_option(option="Save File As",command=save_file)
@@ -752,6 +751,7 @@ github @Moritz344 or if you need any help."""
 
             dropdown_4 = CustomDropdownMenu(widget=button_4)
 
+            dropdown_4.add_option(option="Settings",command=self.settings)
             dropdown_4.add_option(option="File Info",command=self.file_info)
 
             submenu_2 = dropdown_4.add_submenu("Preferences")
