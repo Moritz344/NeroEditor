@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import subprocess
 import CTkMessagebox
+from CTkSpinbox import *
 import os
 from tkinter import *
 import tkinter as tk
@@ -17,7 +18,6 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 
-# TODO: more tooltips,more messagebox,more icons?
 # TODO: zip datei release
 
 
@@ -96,14 +96,15 @@ class StartScreen(ctk.CTk):
 
 
 class SyntaxHighlighting:
-    def __init__(self,textbox,filetype,fg_color,text_color):
+    def __init__(self,textbox,filetype,fg_color,text_color,syntax):
        
         self.textbox = textbox
         self.current_filetype = filetype
         self.fg_color = fg_color
         self.text_color = text_color
+        self.syntax_toggle = syntax
         
-        if self.current_filetype == "Python ":
+        if self.current_filetype == "Python " and self.syntax_toggle == "on":
             self.textbox.tag_config("keyword",foreground=keyword)
             self.textbox.tag_config("string",foreground=string)
             self.textbox.tag_config("comment",foreground=comment)
@@ -148,33 +149,34 @@ class SyntaxHighlighting:
             prev_char = self.textbox.get(pos + "-1c",pos)
 
 
-            if prev_char  == '(' :
-                if event.keysym not in("BackSpace","Delete","Caps_Lock","Right","Left"):
-                    self.textbox.insert(pos,')')
-                    self.textbox.mark_set("insert", pos)
-                if event.keysym in ("BackSpace","Delete"):
-                    self.textbox.delete(pos + "-1c" ,pos)
-            elif prev_char  == '{' :
-                if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
-                    if event.type != tk.EventType.KeyPress:
-                        self.textbox.insert(pos,'}')
+            if self.current_filetype == "Python ":
+                if prev_char  == '(' :
+                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Right","Left"):
+                        self.textbox.insert(pos,')')
                         self.textbox.mark_set("insert", pos)
-                if event.keysym in ("BackSpace","Delete"):
-                    self.textbox.delete(pos + "-1c" ,pos)
-            elif prev_char == '[':
-                if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
-                    if event.type != tk.EventType.KeyPress:
-                        self.textbox.insert(pos,']')
-                        self.textbox.mark_set("insert", pos)
-                if event.keysym in ("BackSpace","Delete"):
-                    self.textbox.delete(pos + "-1c" ,pos)
-            elif prev_char == '"':
-                if event.keysym not in("Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
-                    if event.type != tk.EventType.KeyPress:
-                        self.textbox.insert(pos,'"')
-                        self.textbox.mark_set("insert", pos)
-                if event.keysym in ("BackSpace","Delete"):
-                    self.textbox.delete(pos + "-1c" ,pos)
+                    if event.keysym in ("BackSpace","Delete"):
+                        self.textbox.delete(pos + "-1c" ,pos)
+                elif prev_char  == '{' :
+                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                        if event.type != tk.EventType.KeyPress:
+                            self.textbox.insert(pos,'}')
+                            self.textbox.mark_set("insert", pos)
+                    if event.keysym in ("BackSpace","Delete"):
+                        self.textbox.delete(pos + "-1c" ,pos)
+                elif prev_char == '[':
+                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                        if event.type != tk.EventType.KeyPress:
+                            self.textbox.insert(pos,']')
+                            self.textbox.mark_set("insert", pos)
+                    if event.keysym in ("BackSpace","Delete"):
+                        self.textbox.delete(pos + "-1c" ,pos)
+                elif prev_char == '"':
+                    if event.keysym not in("Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                        if event.type != tk.EventType.KeyPress:
+                            self.textbox.insert(pos,'"')
+                            self.textbox.mark_set("insert", pos)
+                    if event.keysym in ("BackSpace","Delete"):
+                        self.textbox.delete(pos + "-1c" ,pos)
 
 
     def highlighting_syntax(self,event=None):
@@ -198,6 +200,10 @@ class SyntaxHighlighting:
 
             self.textbox.mark_set("insert", cursor_pos)
 
+
+
+
+
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
@@ -219,11 +225,14 @@ class Widgets(ctk.CTkFrame):
         self.max_font_size = max_font_size
         self.min_font_size = min_font_size
         self.font_art = "normal"
-        
-        
+
+
+        self.anzahl_tabs = tabs
+        self.syntax = "on"
+        self.border_spacing = border_spacing
         
         self.current_filetype = None
-        self.current_lines = None
+        self.current_lines = 0
         self.filesize = 0
 
         self.path = path
@@ -249,12 +258,11 @@ class Widgets(ctk.CTkFrame):
 
         # gedrückte tasten
         self.pressed_keys = set()
-
+        
 
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
-
-    
+        
             
 
         
@@ -290,9 +298,8 @@ class Widgets(ctk.CTkFrame):
 
         for i,line in enumerate(lines):
             self.current_lines = i
-            
-
-
+        
+    
 
     def current_window_size(self,window,) -> int:
         
@@ -321,7 +328,7 @@ class Widgets(ctk.CTkFrame):
         self.file_btn.configure(text=path[-1])
         self.path_len = len(path[-1])
         self.update_icon()
-        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color)
+        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax)
         
         
         
@@ -359,8 +366,70 @@ class Widgets(ctk.CTkFrame):
         except Exception:
             print("nothing to redo")
 
+
+
     def settings(self):
-        pass
+        window = ctk.CTkToplevel()
+        window.geometry("300x350")
+        window.title("Settings")
+        window.minsize(300,350)
+        window.maxsize(300,350)
+
+        def change_tabs(value):
+            self.anzahl_tabs = value
+            self.write_preferences_to_json("settings","tabs",self.anzahl_tabs)
+            self.update_textbox_font()
+
+        def change_syntax():
+            self.syntax = self.check_var.get()
+            self.write_preferences_to_json("settings","syntax",self.syntax)
+            SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax)
+
+        def change_border_spacing(v):
+            self.border_spacing = v
+            self.write_preferences_to_json("settings","border_spacing",self.border_spacing)
+            self.update_textbox_font()
+
+        # sprache ändern
+
+        
+        tab_label = ctk.CTkLabel(window,text="Tabs",font=("opensans",25))
+        tab_label.place(x=120,y=11)
+
+
+        self.spinbox = CTkSpinbox(window,
+            start_value=self.anzahl_tabs,
+            max_value=50,
+            min_value=5,
+            step_value=5,
+            scroll_value=5,
+            command=change_tabs)
+        self.spinbox.place(x=100,y=50)
+        
+        self.check_var = ctk.StringVar(value="on")
+
+        syntax_label = ctk.CTkLabel(window,text="Syntax Highlighter",font=("opensans",25))
+        syntax_label.place(x=60,y=111)
+
+        CTkToolTip(syntax_label,delay=0.3,message="Only Python supported")
+
+        self.checkbutton = ctk.CTkCheckBox(window,text=f"on/off",
+        variable=self.check_var,onvalue="on",offvalue="off",command=change_syntax
+                                           )
+        self.checkbutton.place(x=100,y=150)
+        CTkToolTip(self.checkbutton,delay=0.3,message="Only Python supported")
+
+        border_spacing_label = ctk.CTkLabel(window,text="Border Spacing",font=("opensans",25))
+        border_spacing_label.place(x=60,y=211)
+
+        self.spinbox_2 = CTkSpinbox(window,
+            start_value=self.border_spacing,
+            max_value=50,
+            min_value=0,
+            step_value=2,
+            scroll_value=5,
+            command=change_border_spacing)
+        self.spinbox_2.place(x=100,y=250)
 
     def file_info(self):
 
@@ -386,7 +455,7 @@ class Widgets(ctk.CTkFrame):
 
 
         self.filetype_label = ctk.CTkLabel(info_frame,
-        text=f"Filetype: {self.current_filetype}",
+        text=f"Filetype: \t\t{self.current_filetype}",
         width=0,
         height=0,
         font=("opensans",standard_font_size))
@@ -396,7 +465,7 @@ class Widgets(ctk.CTkFrame):
         
         self.path_name = self.path.split("/")
         self.path_label = ctk.CTkLabel(info_frame,
-        text=f"Path: {self.path_name[-1]}",
+        text=f"Path: \t\t{self.path_name[-1]}",
         font=("opensans",standard_font_size))
         self.path_label.place(x=10,y=140)
 
@@ -407,10 +476,13 @@ class Widgets(ctk.CTkFrame):
             pass
 
 
-        self.filesize_label = ctk.CTkLabel(info_frame,text=f"Filesize: {self.filesize}B",font=("opensans",standard_font_size))
+        self.filesize_label = ctk.CTkLabel(info_frame,
+        text=f"Filesize: \t\t{self.filesize}B",
+        font=("opensans",standard_font_size),
+        )
         self.filesize_label.place(x=10,y=170)
         
-        self.counter = ctk.CTkLabel(info_frame,text=f"Lines: {self.current_lines}",
+        self.counter = ctk.CTkLabel(info_frame,text=f"Lines: \t\t{self.current_lines}",
         width=0,
         height=0,
         font=("opensans",standard_font_size))
@@ -436,15 +508,16 @@ class Widgets(ctk.CTkFrame):
         fg_color=self.fg_color,
         undo=True,
         wrap=None,
-        tabs=(30),
+        tabs=self.anzahl_tabs,
         cursor="ibeam",
-        border_spacing=2,
+        border_spacing=self.border_spacing,
         font=(self.font,self.font_size,self.font_art))
         self.textbox.place(x=0,y=60)
         
 
     def update_textbox_font(self):
-        self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size))
+        self.textbox.configure(fg_color=self.fg_color,text_color=self.text_color,font=(self.font,self.font_size)
+        ,tabs=self.anzahl_tabs,border_spacing=self.border_spacing)
 
 
     def open_new_file(master) : 
@@ -506,13 +579,19 @@ class Widgets(ctk.CTkFrame):
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
                          self.count_lines()
+
+                         CTkMessagebox.CTkMessagebox(title="Opened File",icon="check",
+                         message=f"Opened File successfuly in {self.path}")
                 except Exception as e:
                     print("please please please",e)
             def save():
                 try:
-                    with open(self.path,"w",encoding="utf-8") as file:
-                        content = self.textbox.get(1.0,tk.END)
-                        file.write(content)
+                    if self.path != "<untitled>":
+                        with open(self.path,"w",encoding="utf-8") as file:
+                            content = self.textbox.get(1.0,tk.END)
+                            file.write(content)
+                            CTkMessagebox.CTkMessagebox(title="Saved File",icon="check",
+                            message=f"Saved File successfuly in {self.path}")
                         
                 except Exception as e:
                     print("oof",e)
@@ -592,36 +671,30 @@ class Widgets(ctk.CTkFrame):
 
             def about_window():
                 root = ctk.CTkToplevel(self)
-                root.geometry("650x300")
+                root.geometry("350x300")
                 root.title("About")
                 root.maxsize(650,300)
                 root.minsize(650,300)
 
+                nero_image = ctk.CTkImage(Image.open("assets/nero.png"),size=(80,80))
+                nero_label = ctk.CTkLabel(root,text="",image=nero_image)
+                nero_label.place(x=275,y=60)
+
+                expl = "NeroEditor is a minimalistic \neditor written in python"
+                ctk.CTkLabel(master=root,
+                text="NeroEditor",#
+                font=("opensans",30)).place(x=250,y=10)
+                ctk.CTkLabel(root,
+                text=expl,
+                font=("opensans",standard_font_size)).place(x=170,y=150)
                 
+                github_icon = ctk.CTkImage(Image.open("assets/github_icon.png"),size=(35,35))
+                github_link = ctk.CTkLabel(root,text="",
+                font=("opensans",10,),image=github_icon)
+                github_link.place(x=600,y=250)
                 
-                text_list="""Thanks for using this app!
+                tooltip_1 = CTkToolTip(github_link,message="https://github.com/Moritz344/NeroEditor")
 
-I'm Currently learning how to make guis with python(customtkinter).
-If you have anything I can do better please make a pull request on my
-github @Moritz344 or if you need any help."""
-
-
-
-
-                normal_text = ctk.CTkTextbox(
-                    master=root,
-                    font=("opensans",20),
-                    width=700,
-                    height=500,
-                    text_color="white",
-                    fg_color=background_color,
-
-                )
-
-
-                normal_text.insert("10.0",text_list)
-                normal_text.configure(state="disabled")
-                normal_text.place(x=0,y=0)
 
             def light_mode():
                 self.fg_color = "white"
@@ -675,14 +748,17 @@ github @Moritz344 or if you need any help."""
                     with open(self.path,"r",encoding="utf-8") as file:
                         content = file.read()
 
-                    
-
                     try:
-                        if sys.platform == "win32":
+                        self.path_name = self.path.split(".")
+                        if sys.platform == "win32" and self.path_name[-1] == "py":
                             subprocess.run(["python",self.path],
                             creationflags=subprocess.CREATE_NEW_CONSOLE)
                         else:
-                            subprocess.Popen(["x-terminal-emulator","-e","python3",self.path]) 
+                            CTkMessagebox.CTkMessagebox(title="Warning",
+                            message=f"{self.current_filetype} is not a Python file!",
+                            icon="warning",
+                            font=("opensans",20),
+                            )
 
                     except Exception as e:
                         print("Fehler beim Öffnen des Terminals.",e)
@@ -692,7 +768,6 @@ github @Moritz344 or if you need any help."""
                     CTkMessagebox.CTkMessagebox(title="Warning",
                     message="No Python file found",
                     icon="warning",
-                    fade_in_duration=1,
                     font=("opensans",20),
                     )
 
@@ -730,6 +805,8 @@ github @Moritz344 or if you need any help."""
             
 
             
+
+            
             # Recent File submenu
             submenu_1 = dropdown_1.add_submenu("Recent File")
             submenu_1.add_option(option=f"{files}",command=open_recent_file)
@@ -737,8 +814,6 @@ github @Moritz344 or if you need any help."""
             dropdown_2 = CustomDropdownMenu(widget=button_2)
             dropdown_2.add_option(option="About")
 
-            dropdown_3 = CustomDropdownMenu(widget=button_3)
-            dropdown_3.add_option(option="Run Python Skript")
 
             # Preference submenu
 

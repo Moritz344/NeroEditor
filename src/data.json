@@ -1,7 +1,12 @@
 {
     "preferences": {
-        "font": "opensans",
+        "font": "Comic Sans MS",
         "colorscheme": "#171614"
+    },
+    "settings": {
+        "tabs": 30,
+        "syntax": "on",
+        "border_spacing": 0
     },
     "other": {
         "standard_font_size": 25,
@@ -10,7 +15,7 @@
         "min_font_size": 25,
         "path": "<untitled>",
         "background_color": "#171614",
-        "files": "C:/Users/tmaie/dev/tkinter/apps/NeroEditor/src/assets/icons-Info.txt",
+        "files": "C:/Users/tmaie/OneDrive/Dokumente/scripts/data.json",
         "datatypes": [
             [
                 "Alle-Dateien",
