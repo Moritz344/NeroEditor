@@ -54,8 +54,8 @@ python3 main.py
 ```
 
 
-⚠ Note: There is no  executable files yet.
-If you want to test the app, you'll need to build it from the source code.
+⚠ Note: There is now an executable file you can run to use the app.
+
 
 
 # Author
