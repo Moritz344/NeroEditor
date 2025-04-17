@@ -1,6 +1,9 @@
 customtkinter
-tkinter
+tk
 CTkListbox
 pillow
 CTkMessagebox
 CTkTooltip
+CTkSpinbox
+CTkMenubar
+
