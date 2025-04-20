@@ -143,41 +143,33 @@ class SyntaxHighlighting:
             self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
 
     def autocompletion(self,event=None):
-
             pos = self.textbox.index("insert")
             text = self.textbox.get("1.0",pos)
             prev_char = self.textbox.get(pos + "-1c",pos)
-
-
+            blocked_chars = ("BackSpace","Delete","Caps_Lock","Right","Left","Down","Up","Shift_R","Control_L","Alt_R","Alt_L","Delete","ISO_Level3_Shift")
+            print("Debug: ",event.keysym)
             if self.current_filetype == "Python ":
-                if prev_char  == '(' :
-                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Right","Left"):
-                        self.textbox.insert(pos,')')
-                        self.textbox.mark_set("insert", pos)
+                if prev_char  == '(' and not event.keysym in blocked_chars:
+                    print("DEBUG",prev_char)
+                    self.textbox.insert(pos,')')
+                    self.textbox.mark_set("insert", pos)
                     if event.keysym in ("BackSpace","Delete"):
                         self.textbox.delete(pos + "-1c" ,pos)
-                elif prev_char  == '{' :
-                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                elif prev_char == '{' :
+                    if event.keysym not in blocked_chars:
                         if event.type != tk.EventType.KeyPress:
                             self.textbox.insert(pos,'}')
                             self.textbox.mark_set("insert", pos)
                     if event.keysym in ("BackSpace","Delete"):
                         self.textbox.delete(pos + "-1c" ,pos)
                 elif prev_char == '[':
-                    if event.keysym not in("BackSpace","Delete","Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
+                    if event.keysym not in blocked_chars:
                         if event.type != tk.EventType.KeyPress:
                             self.textbox.insert(pos,']')
                             self.textbox.mark_set("insert", pos)
                     if event.keysym in ("BackSpace","Delete"):
                         self.textbox.delete(pos + "-1c" ,pos)
-                elif prev_char == '"':
-                    if event.keysym not in("Caps_Lock","Control_L","Alt_R","Alt_L","Right","Left"):
-                        if event.type != tk.EventType.KeyPress:
-                            self.textbox.insert(pos,'"')
-                            self.textbox.mark_set("insert", pos)
-                    if event.keysym in ("BackSpace","Delete"):
-                        self.textbox.delete(pos + "-1c" ,pos)
-
+                    # deleted autocompletion for ""
 
     def highlighting_syntax(self,event=None):
             cursor_pos = self.textbox.index("insert")
@@ -509,7 +501,6 @@ class Widgets(ctk.CTkFrame):
         undo=True,
         wrap=None,
         tabs=self.anzahl_tabs,
-        cursor="ibeam",
         border_spacing=self.border_spacing,
         font=(self.font,self.font_size,self.font_art))
         self.textbox.place(x=0,y=60)
@@ -675,11 +666,12 @@ class Widgets(ctk.CTkFrame):
                 root.title("About")
                 root.maxsize(650,300)
                 root.minsize(650,300)
-
-                nero_image = ctk.CTkImage(Image.open("assets/nero.png"),size=(80,80))
-                nero_label = ctk.CTkLabel(root,text="",image=nero_image)
-                nero_label.place(x=275,y=60)
-
+                try:
+                    nero_image = ctk.CTkImage(Image.open("assets/nero.png"),size=(80,80))
+                    nero_label = ctk.CTkLabel(root,text="",image=nero_image)
+                    nero_label.place(x=279,y=60)
+                except Exception as e:
+                    print(e)
                 expl = "NeroEditor is a minimalistic \neditor written in python"
                 ctk.CTkLabel(master=root,
                 text="NeroEditor",#
