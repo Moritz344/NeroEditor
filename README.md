@@ -48,6 +48,7 @@
 ```bash
 git clone https://github.com/Moritz344/NeroEditor.git
 cd NeroEditor
+pip install -r requirements.txt
 cd src
 python3 main.py
 
