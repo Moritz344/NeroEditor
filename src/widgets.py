@@ -18,8 +18,8 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 
-# TODO: zip datei release
-
+# TODO: fix autocompletion issues
+# TODO: replace filedialog with more modern one
 
 class StartScreen(ctk.CTk):
     def __init__(self):
@@ -68,11 +68,15 @@ class StartScreen(ctk.CTk):
         
         def show_value():
             print(tooltip_1.get())
-        self.github_icon = ctk.CTkImage(light_image=Image.open("assets/github_icon.png"),size=(50,50))
-        self.github_btn = ctk.CTkButton(self,text="",image=self.github_icon,fg_color="#212121",
-        width=50,height=20,
-        hover_color="#212121")
-        self.github_btn.place(x=0,y=540)
+        try:
+            self.github_icon = ctk.CTkImage(light_image=Image.open("assets/github_icon.png"),size=(50,50))
+            self.github_btn = ctk.CTkButton(self,text="",image=self.github_icon,fg_color="#212121",
+            width=50,height=20,
+            hover_color="#212121")
+            self.github_btn.place(x=0,y=540)
+        except Exception as e:
+            print("I was not able to load this image",e)
+
         tooltip_1 = CTkToolTip(self.github_btn,delay=0.3,message="github.com/Moritz344")
 
 
@@ -103,24 +107,27 @@ class SyntaxHighlighting:
         self.fg_color = fg_color
         self.text_color = text_color
         self.syntax_toggle = syntax
-        
-        if self.current_filetype == "Python " and self.syntax_toggle == "on":
-            self.textbox.tag_config("keyword",foreground=keyword)
-            self.textbox.tag_config("string",foreground=string)
-            self.textbox.tag_config("comment",foreground=comment)
+        try:
+            if self.current_filetype == "Python " and self.syntax_toggle == "on":
+                self.textbox.tag_config("keyword",foreground=keyword)
+                self.textbox.tag_config("string",foreground=string)
+                self.textbox.tag_config("comment",foreground=comment)
 
-            self.textbox.tag_config("other1",foreground="#fb4934")
-            self.textbox.tag_config("other2",foreground="#b16286")
+                self.textbox.tag_config("other1",foreground="#fb4934")
+                self.textbox.tag_config("other2",foreground="#b16286")
        
-            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
-            self.textbox.bind("<Button-1>",self.highlighting_syntax)
-        else:
-            self.change_colors()
+                self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
+                self.textbox.bind("<Button-1>",self.highlighting_syntax)
+            else:
+                self.change_colors()
+        except Exception as e:
+            print(e)
         
         self.textbox.bind("<KeyRelease>",self.autocompletion)
         self.textbox.bind("<KeyPress>",self.autocompletion)
 
     def change_colors(self):
+        # dark mode und light mode switch
         if self.fg_color == "#171614":
             self.text_color = "white"
             self.textbox.tag_config("keyword",foreground="white")
@@ -148,9 +155,9 @@ class SyntaxHighlighting:
             prev_char = self.textbox.get(pos + "-1c",pos)
             blocked_chars = ("BackSpace","Delete","Caps_Lock","Right","Left","Down","Up","Shift_R","Control_L","Alt_R","Alt_L","Delete","ISO_Level3_Shift")
             print("Debug: ",event.keysym)
+            print("DEBUG",prev_char)
             if self.current_filetype == "Python ":
                 if prev_char  == '(' and not event.keysym in blocked_chars:
-                    print("DEBUG",prev_char)
                     self.textbox.insert(pos,')')
                     self.textbox.mark_set("insert", pos)
                     if event.keysym in ("BackSpace","Delete"):
