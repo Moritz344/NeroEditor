@@ -1,0 +1,3 @@
+[console_scripts]
+anime-info = anime_info.main:cli_entry_point
+

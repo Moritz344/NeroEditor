@@ -1,0 +1,3 @@
+[console_scripts]
+mcscan = mc_server_status.main:cli_entry_point
+

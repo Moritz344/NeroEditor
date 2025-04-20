@@ -13,6 +13,8 @@ def get_data_from_json() -> str:
             files = data["other"]["files"]
             project_name=data["other"]["project_name"]
 
+            tabs = data["settings"]["tabs"] 
+            border_spacing = data["settings"]["border_spacing"] 
             datatypes = data["other"]["datatypes"]
 
             string = data["syntax"]["strings"]
@@ -20,7 +22,7 @@ def get_data_from_json() -> str:
             comment = data["syntax"]["comment"]
 
 
-            return font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes
+            return font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes,tabs,border_spacing
             
-font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes = get_data_from_json()
+font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes,tabs,border_spacing = get_data_from_json()
 
