@@ -3,6 +3,8 @@ import CTkMessagebox
 from widgets import *
 from tkinter import *
 from settings import project_name
+from start_screen import StartScreen 
+import customtkinter as ctk
 
 class App(ctk.CTk):
     def __init__(self):
@@ -11,7 +13,8 @@ class App(ctk.CTk):
         self.geometry("1000x600")
         self.minsize(1000,600)
         self.title(project_name)
-        self.configure(fg_color="#32373b")
+        arrow = "@Normal.cur"
+        self.configure(fg_color="#32373b",cursor=arrow,)
 
 
 
@@ -24,7 +27,6 @@ class App(ctk.CTk):
             option_2="Yes",
             text_color="white",
             message="Are you sure you saved your file?",
-            fade_in_duration=0.5,
             font=("opensans",20),
                     )
             response = msg.get()
@@ -35,7 +37,6 @@ class App(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW",on_closing)
 
         Widgets(self)
-        
 
         self.mainloop()
 
