@@ -13,201 +13,23 @@ from settings import *
 from tkinter import messagebox
 import json
 from PIL import Image,ImageTk
-import re
 from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
+from syntax import SyntaxHighlighting 
 
 # TODO: fix autocompletion issues
 # TODO: replace filedialog with more modern one
-
-class StartScreen(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-
-
-        self.geometry("800x600")
-        self.title(project_name)
-        self.maxsize(800,600)
-        self.minsize(800,600)
-        ctk.set_appearance_mode("system")
-
-
-        def start_app():
-            self.destroy()
-
-
-
-        button_frame = ctk.CTkFrame(self,width=800,height=420,fg_color="#222222",)
-        button_frame.place(x=0,y=180)
-
-        header_frame = ctk.CTkFrame(self,width=800,height=200,corner_radius=0,fg_color="#222222")
-
-        start_btn = ctk.CTkButton(
-        master=button_frame,
-        text="Start",
-        width=200,
-        height=50,
-        font=("opensans",50),
-        command=start_app,
-
-        )
-
-
-        start_btn.place(x=280,y=130)
-
-        quit_btn = ctk.CTkButton(
-        button_frame,
-        width=200,
-        text="Quit",
-        font=("opensans",50),
-        command=lambda: sys.exit() 
-        )
-
-        quit_btn.place(x=280,y=210)
-        
-        def show_value():
-            print(tooltip_1.get())
-        try:
-            self.github_icon = ctk.CTkImage(light_image=Image.open("assets/github_icon.png"),size=(50,50))
-            self.github_btn = ctk.CTkButton(self,text="",image=self.github_icon,fg_color="#212121",
-            width=50,height=20,
-            hover_color="#212121")
-            self.github_btn.place(x=0,y=540)
-        except Exception as e:
-            print("I was not able to load this image",e)
-
-        tooltip_1 = CTkToolTip(self.github_btn,delay=0.3,message="github.com/Moritz344")
-
-
-        header_frame.place(x=0,y=0)
-        header = ctk.CTkLabel(
-        header_frame,
-        text="Welcome",
-        width=300,
-        height=100,
-        font=("Segoe UI Light",100),
-        corner_radius=10
-        )
-        header.place(x=180,y=50)
-        
-        
-        self.protocol("WM_DELETE_WINDOW",lambda: sys.exit())
-
-
-        self.mainloop()
-
-
-
-class SyntaxHighlighting:
-    def __init__(self,textbox,filetype,fg_color,text_color,syntax):
-       
-        self.textbox = textbox
-        self.current_filetype = filetype
-        self.fg_color = fg_color
-        self.text_color = text_color
-        self.syntax_toggle = syntax
-        try:
-            if self.current_filetype == "Python " and self.syntax_toggle == "on":
-                self.textbox.tag_config("keyword",foreground=keyword)
-                self.textbox.tag_config("string",foreground=string)
-                self.textbox.tag_config("comment",foreground=comment)
-
-                self.textbox.tag_config("other1",foreground="#fb4934")
-                self.textbox.tag_config("other2",foreground="#b16286")
-       
-                self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
-                self.textbox.bind("<Button-1>",self.highlighting_syntax)
-            else:
-                self.change_colors()
-        except Exception as e:
-            print(e)
-        
-        self.textbox.bind("<KeyRelease>",self.autocompletion)
-        self.textbox.bind("<KeyPress>",self.autocompletion)
-
-    def change_colors(self):
-        # dark mode und light mode switch
-        if self.fg_color == "#171614":
-            self.text_color = "white"
-            self.textbox.tag_config("keyword",foreground="white")
-            self.textbox.tag_config("string",foreground="white")
-            self.textbox.tag_config("comment",foreground="white")
-
-            self.textbox.tag_config("other1",foreground="white")
-            self.textbox.tag_config("other2",foreground="white")
-       
-            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
-        elif self.fg_color == "white":
-            self.text_color = "black"
-            self.textbox.tag_config("keyword",foreground="black")
-            self.textbox.tag_config("string",foreground="black")
-            self.textbox.tag_config("comment",foreground="black")
-
-            self.textbox.tag_config("other1",foreground="black")
-            self.textbox.tag_config("other2",foreground="black")
-       
-            self.textbox.bind("<KeyRelease>",self.highlighting_syntax)
-
-    def autocompletion(self,event=None):
-            pos = self.textbox.index("insert")
-            text = self.textbox.get("1.0",pos)
-            prev_char = self.textbox.get(pos + "-1c",pos)
-            blocked_chars = ("BackSpace","Delete","Caps_Lock","Right","Left","Down","Up","Shift_R","Control_L","Alt_R","Alt_L","Delete","ISO_Level3_Shift")
-            print("Debug: ",event.keysym)
-            print("DEBUG",prev_char)
-            if self.current_filetype == "Python ":
-                if prev_char  == '(' and not event.keysym in blocked_chars:
-                    self.textbox.insert(pos,')')
-                    self.textbox.mark_set("insert", pos)
-                    if event.keysym in ("BackSpace","Delete"):
-                        self.textbox.delete(pos + "-1c" ,pos)
-                elif prev_char == '{' :
-                    if event.keysym not in blocked_chars:
-                        if event.type != tk.EventType.KeyPress:
-                            self.textbox.insert(pos,'}')
-                            self.textbox.mark_set("insert", pos)
-                    if event.keysym in ("BackSpace","Delete"):
-                        self.textbox.delete(pos + "-1c" ,pos)
-                elif prev_char == '[':
-                    if event.keysym not in blocked_chars:
-                        if event.type != tk.EventType.KeyPress:
-                            self.textbox.insert(pos,']')
-                            self.textbox.mark_set("insert", pos)
-                    if event.keysym in ("BackSpace","Delete"):
-                        self.textbox.delete(pos + "-1c" ,pos)
-                    # deleted autocompletion for ""
-
-    def highlighting_syntax(self,event=None):
-            cursor_pos = self.textbox.index("insert")
-
-            self.keywords = r"\b(import|from|if|else|elif|while|for|finally|with|as|pass|break|continue|lambda|yield|global|nonlocal|assert|raise)\b"
-            strings = r"(['\"])(?:(?=(\\?))\2.)*?\1"  
-            comments = r"#.*"  
-
-            other_1 = r"\b(def|return|except|try|class)\b"
-            other_2 = r"\b(print)\b"
-            
-            text = self.textbox.get("1.0","end-1c")
-            
-            for pattern, tag in [(self.keywords, "keyword"), (other_2,"other2"),(strings, "string"), (comments, "comment"), (other_1,"other1")]:
-                for match in re.finditer(pattern, text):
-                    start_idx = f"1.0 + {match.start()} chars"
-                    end_idx = f"1.0 + {match.end()} chars"
-
-                    self.textbox.tag_add(tag, start_idx, end_idx)
-
-            self.textbox.mark_set("insert", cursor_pos)
-
-
-
+# TODO: change cursor
+# TODO: autocompletion setting on/off
 
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
 
-        
+        self.hand_cursor = "@hand.cur"
+        self.arrow_cursor = "@Normal.cur"
         self.font = font
         self.colorscheme = colorscheme
 
@@ -321,16 +143,14 @@ class Widgets(ctk.CTkFrame):
             
 
 
-    def update_file_name(self,path) -> str:
+    def update_file_name(self,path) :
         self.path = path
         path = self.path.split("/")
+        #print("Debug:",path)
         self.file_btn.configure(text=path[-1])
         self.path_len = len(path[-1])
         self.update_icon()
         SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax)
-        
-        
-        
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
        self.check_combination()
@@ -509,7 +329,8 @@ class Widgets(ctk.CTkFrame):
         wrap=None,
         tabs=self.anzahl_tabs,
         border_spacing=self.border_spacing,
-        font=(self.font,self.font_size,self.font_art))
+        font=(self.font,self.font_size,self.font_art),
+        cursor=self.arrow_cursor)
         self.textbox.place(x=0,y=60)
         
 
@@ -727,7 +548,7 @@ class Widgets(ctk.CTkFrame):
                             option_1="Ok",
                             text_color="white",
                             message=f"Your file got created sucessfuly in: {file_path}",
-                            font=("opensans",20),)
+                            font=("opensans",15),)
 
                         msg.geometry("+500+300")
 
@@ -771,43 +592,41 @@ class Widgets(ctk.CTkFrame):
                     )
 
             def open_recent_file() -> None:
+                try:
+                    with open(self.files,"r",encoding="utf-8") as file:
+                        content = file.read()
+                        path_name = self.files.split("/")
+                        path_recent = path_name[-1]
 
-                with open(self.files,"r",encoding="utf-8") as file:
-                    content = file.read()
-                    
-                    path_name = self.files.split("/")
-                    path_recent = path_name[-1]
-
-                    self.update_file_name(self.files)
-                    
-                    self.textbox.delete(1.0,tk.END)
-                    self.textbox.insert(1.0,content)
-                    
-                
-                    self.count_lines()
-
+                        self.update_file_name(self.files)
+                        self.textbox.delete(1.0,tk.END)
+                        self.textbox.insert(1.0,content)
+                        self.count_lines()
+                except Exception:
+                    CTkMessagebox.CTkMessagebox(title="Error",icon="warning",message="That path does not exist.",
+                    font=("opensans",20))
 
 
-            menu = CTkMenuBar(master,bg_color="#171614")
+            menu = CTkMenuBar(master,bg_color="#171614",)
             button_1 = menu.add_cascade("File")
             button_4 = menu.add_cascade("Settings")
             button_2 = menu.add_cascade("Help")
             button_3 = menu.add_cascade("Execute")
             
-            dropdown_1 = CustomDropdownMenu(widget=button_1)
+            dropdown_1 = CustomDropdownMenu(widget=button_1,)
             dropdown_1.add_option(option="Open",command=open_file)
             dropdown_1.add_option(option="Create New",command=new_file)
             dropdown_1.add_option(option="Save ",command=save)
+            dropdown_1.add_option(option="Save File As",command=save_file)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
-            dropdown_1.add_option(option="Save File As",command=save_file)
             
 
             
 
             
             # Recent File submenu
-            submenu_1 = dropdown_1.add_submenu("Recent File")
+            submenu_1 = dropdown_1.add_submenu("Recent File",)
             submenu_1.add_option(option=f"{files}",command=open_recent_file)
 
             dropdown_2 = CustomDropdownMenu(widget=button_2)
