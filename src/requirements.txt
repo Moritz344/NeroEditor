@@ -1,6 +1,4 @@
 customtkinter
 tk
 pillow
-CTkListbox
 CTkSpinbox
-CTkMenubar
