@@ -4,8 +4,8 @@
         "colorscheme": "#171614"
     },
     "settings": {
-        "tabs": 25,
-        "syntax": "off",
+        "tabs": 30,
+        "syntax": "on",
         "border_spacing": 0
     },
     "other": {

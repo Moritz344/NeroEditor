@@ -255,59 +255,62 @@ class Widgets(ctk.CTkFrame):
         self.info_window.maxsize(500,300)
 
 
-
-        info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
-        info_frame.place(x=0,y=0)
-
-
-        header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
-        header.place(x=180,y=5)
-
-
-        self.filetype_label = ctk.CTkLabel(info_frame,
-        text=f"Filetype: \t\t{self.current_filetype}",
-        width=0,
-        height=0,
-        font=("opensans",standard_font_size))
-        
-        self.filetype_label.place(x=10,y=110)
-
-        
-        self.path_name = self.path.split("/")
-        self.path_label = ctk.CTkLabel(info_frame,
-        text=f"Path: \t\t{self.path_name[-2]}/{self.path_name[-1]}",
-        font=("opensans",standard_font_size))
-        self.path_label.place(x=10,y=140)
-
-        
         try:
-            self.filesize = os.path.getsize(self.path)
-        except Exception:
-            pass
+            info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
+            info_frame.place(x=0,y=0)
 
 
-        self.filesize_label = ctk.CTkLabel(info_frame,
-        text=f"Filesize: \t\t{self.filesize}B",
-        font=("opensans",standard_font_size),
-        )
-        self.filesize_label.place(x=10,y=170)
-        
-        self.counter = ctk.CTkLabel(info_frame,text=f"Lines: \t\t{self.current_lines}",
-        width=0,
-        height=0,
-        font=("opensans",standard_font_size))
-        self.count_lines()
-        self.counter.place(x=10,y=80)
+            header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
+            header.place(x=180,y=5)
 
 
-        tooltip_1 = CTkToolTip(self.path_label,message=f"{self.path}")
-        tooltip_2 = CTkToolTip(self.filetype_label,
-        message=f"{self.current_filetype}")
+            self.filetype_label = ctk.CTkLabel(info_frame,
+            text=f"Filetype: \t\t{self.current_filetype}",
+            width=0,
+            height=0,
+            font=("opensans",standard_font_size))
+            
+            self.filetype_label.place(x=10,y=110)
 
-        tooltip_3 = CTkToolTip(self.filesize_label,
-        message=f"{self.filesize}B (that's massive)")
-        tooltip_4 = CTkToolTip(self.counter,
-        message=f"{self.current_lines}")
+            self.path_name = self.path.split("/")
+            self.path_label = ctk.CTkLabel(info_frame,
+            text=f"Path: \t\t{self.path_name[-2]}/{self.path_name[-1]}",
+            font=("opensans",standard_font_size))
+            self.path_label.place(x=10,y=140)
+
+            
+            try:
+                self.filesize = os.path.getsize(self.path)
+            except Exception:
+                pass
+
+
+            self.filesize_label = ctk.CTkLabel(info_frame,
+            text=f"Filesize: \t\t{self.filesize}B",
+            font=("opensans",standard_font_size),
+            )
+            self.filesize_label.place(x=10,y=170)
+            self.counter = ctk.CTkLabel(info_frame,text=f"Lines: \t\t{self.current_lines}",
+            width=0,
+            height=0,
+            font=("opensans",standard_font_size))
+            self.count_lines()
+            self.counter.place(x=10,y=80)
+
+
+            tooltip_1 = CTkToolTip(self.path_label,message=f"{self.path}")
+            tooltip_2 = CTkToolTip(self.filetype_label,
+            message=f"{self.current_filetype}")
+
+            tooltip_3 = CTkToolTip(self.filesize_label,
+            message=f"{self.filesize}B (that's massive)")
+            tooltip_4 = CTkToolTip(self.counter,
+            message=f"{self.current_lines}")
+        except Exception as e:
+            print("DEBUG:",e)
+            self.info_window.destroy()
+            CTkMessagebox.CTkMessagebox(icon="warning",title="Error",
+            message="Please create or open a file before you want to view this option.")
 
 
     def create_textbox(self,window):

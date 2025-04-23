@@ -16,7 +16,7 @@ class App(ctk.CTk):
         arrow = "@Normal.cur"
         self.configure(fg_color="#32373b",cursor=arrow,)
 
-
+        
 
         def on_closing():
             msg = CTkMessagebox.CTkMessagebox(
