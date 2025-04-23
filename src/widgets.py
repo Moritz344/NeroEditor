@@ -17,9 +17,9 @@ from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting 
+from write_to_json import *
 
 # TODO: change cursor
-# TODO: more recent files
 # TODO: make ui better file info
 
 class Widgets(ctk.CTkFrame):
@@ -118,15 +118,11 @@ class Widgets(ctk.CTkFrame):
 
         for i,line in enumerate(lines):
             self.current_lines = i
-        
-    
 
     def current_window_size(self,window,) -> int:
-        
         width,height =  window.winfo_width(),window.winfo_height()
 
         return width,height
-                
 
     def file_name(self,window,path,final_icon):
 
@@ -195,17 +191,17 @@ class Widgets(ctk.CTkFrame):
 
         def change_tabs(value):
             self.anzahl_tabs = value
-            self.write_preferences_to_json("settings","tabs",self.anzahl_tabs)
+            write_preferences_to_json("settings","tabs",self.anzahl_tabs)
             self.update_textbox_font()
 
         def change_syntax():
             self.syntax = self.check_var.get()
-            self.write_preferences_to_json("settings","syntax",self.syntax)
+            write_preferences_to_json("settings","syntax",self.syntax)
             SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax,self.scrollbar)
 
         def change_border_spacing(v):
             self.border_spacing = v
-            self.write_preferences_to_json("settings","border_spacing",self.border_spacing)
+            write_preferences_to_json("settings","border_spacing",self.border_spacing)
             self.update_textbox_font()
 
         # sprache ändern
@@ -365,25 +361,6 @@ class Widgets(ctk.CTkFrame):
             except Exception as e:
                 print(e)
 
-    def write_preferences_to_json(self,main,key,new_value):
-        try:
-            # get the content of the file
-            with open("data.json","r") as file:
-                content = json.load(file)
-
-            if main in content:
-                # z.b: content["preferences"]["font"] = "Arial"
-                content[main][key] = new_value
-
-
-
-            with open("data.json","w") as file:
-                # aktualisiere json file
-                json.dump(content,file,indent=4)
-
-        except Exception as e:
-            print(e)
-
     def menu_func(self,master):
             def open_file():
                 try:
@@ -395,7 +372,7 @@ class Widgets(ctk.CTkFrame):
                  if self.path:
                      if self.max_recent_files > len(files) and self.max_recent_files > len(self.used_files):
                         self.used_files.append(self.path)
-                        self.write_preferences_to_json("other","files",self.used_files)
+                        write_preferences_to_json("other","files",self.used_files)
                      else:
                          print("DEBUG: There are more recent files than allowed.")
                      print(self.used_files)
@@ -453,7 +430,7 @@ class Widgets(ctk.CTkFrame):
 
                 def change_font(selected):
                     self.font = selected
-                    self.write_preferences_to_json("preferences","font",selected)
+                    write_preferences_to_json("preferences","font",selected)
                     self.update_textbox_font()
 
                 values = ["Comic Sans MS","Arial","opensans",]
@@ -480,7 +457,7 @@ class Widgets(ctk.CTkFrame):
                         self.fg_color = background_color
                         self.update_textbox_font()
 
-                    self.write_preferences_to_json("preferences","colorscheme",self.fg_color)
+                    write_preferences_to_json("preferences","colorscheme",self.fg_color)
 
 
 
