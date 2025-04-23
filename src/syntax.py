@@ -2,13 +2,14 @@ from settings import *
 import re
 
 class SyntaxHighlighting:
-    def __init__(self,textbox,filetype,fg_color,text_color,syntax):
+    def __init__(self,textbox,filetype,fg_color,text_color,syntax,scrollbar):
         self.textbox = textbox
+        self.scrollbar = scrollbar
         self.current_filetype = filetype
         self.fg_color = fg_color
         self.text_color = text_color
         self.syntax_toggle = syntax
-        self.autocompletion_toggle = True
+        self.autocompletion_toggle = False
         try:
             if self.current_filetype == "Python " and self.syntax_toggle == "on":
                 self.textbox.tag_config("keyword",foreground=keyword)
@@ -32,7 +33,6 @@ class SyntaxHighlighting:
             self.textbox.bind("<KeyPress>",self.autocompletion)
 
     def change_colors(self):
-        # dark mode und light mode switch
         if self.fg_color == "#171614":
             self.text_color = "white"
             self.textbox.tag_config("keyword",foreground="white")

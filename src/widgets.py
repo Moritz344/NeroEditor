@@ -18,11 +18,9 @@ from CTkMenuBar import *
 from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting 
 
-# TODO: fix autocompletion issues
-# TODO: replace filedialog with more modern one
 # TODO: change cursor
-# TODO: autocompletion setting on/off
-
+# TODO: more recent files
+# TODO: make ui better file info
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -34,10 +32,11 @@ class Widgets(ctk.CTkFrame):
         self.colorscheme = colorscheme
 
         self.files = files
-        
         self.used_files = []
+        self.max_recent_files = 5
         
         self.textbox = None
+        self.scrollbar = None
         self.counter = None
         self.filetype_label = None
         self.info_window = None
@@ -150,7 +149,7 @@ class Widgets(ctk.CTkFrame):
         self.file_btn.configure(text=path[-1])
         self.path_len = len(path[-1])
         self.update_icon()
-        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax)
+        SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax,self.scrollbar)
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
        self.check_combination()
@@ -202,7 +201,7 @@ class Widgets(ctk.CTkFrame):
         def change_syntax():
             self.syntax = self.check_var.get()
             self.write_preferences_to_json("settings","syntax",self.syntax)
-            SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax)
+            SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax,self.scrollbar)
 
         def change_border_spacing(v):
             self.border_spacing = v
@@ -251,8 +250,6 @@ class Widgets(ctk.CTkFrame):
         self.spinbox_2.place(x=100,y=250)
 
     def file_info(self):
-
-
         self.info_window = ctk.CTkToplevel(self)
         self.info_window.geometry("500x300")
         self.info_window.title("File Info")
@@ -266,8 +263,6 @@ class Widgets(ctk.CTkFrame):
         info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
         info_frame.place(x=0,y=0)
 
-        icon = ctk.CTkLabel(info_frame,text="Icons by Flaticon",font=("opensans",15))
-        icon.place(x=360,y=270)
 
         header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
         header.place(x=180,y=5)
@@ -284,7 +279,7 @@ class Widgets(ctk.CTkFrame):
         
         self.path_name = self.path.split("/")
         self.path_label = ctk.CTkLabel(info_frame,
-        text=f"Path: \t\t{self.path_name[-1]}",
+        text=f"Path: \t\t{self.path_name[-2]}/{self.path_name[-1]}",
         font=("opensans",standard_font_size))
         self.path_label.place(x=10,y=140)
 
@@ -320,18 +315,26 @@ class Widgets(ctk.CTkFrame):
 
 
     def create_textbox(self,window):
-
-        
         self.textbox = ctk.CTkTextbox(window,width=1920,height=1080,corner_radius=0,
         text_color=self.text_color,
         fg_color=self.fg_color,
         undo=True,
-        wrap=None,
+        wrap="none",
         tabs=self.anzahl_tabs,
         border_spacing=self.border_spacing,
         font=(self.font,self.font_size,self.font_art),
-        cursor=self.arrow_cursor)
+        cursor=self.arrow_cursor,
+        activate_scrollbars=False,
+        )
         self.textbox.place(x=0,y=60)
+        # scrollbars
+        self.scrollbar = ctk.CTkScrollbar(master=window,orientation="vertical",command=self.textbox.yview
+        ,height=1080,minimum_pixel_length=20,hover=True,fg_color=colorscheme)
+        self.scrollbar.pack(side=RIGHT,padx=0,pady=32,)
+
+
+        self.textbox.configure(yscrollcommand=self.scrollbar.set,)
+
         
 
     def update_textbox_font(self):
@@ -339,18 +342,16 @@ class Widgets(ctk.CTkFrame):
         ,tabs=self.anzahl_tabs,border_spacing=self.border_spacing)
 
 
-    def open_new_file(master) : 
+    def open_new_file(master):
             try:
                  new_window = ctk.CTkToplevel(master)
                  new_window.geometry("800x600")
-                    
                  new_file = filedialog.askopenfile(title="Open File",
                  filetypes=datatypes).name
 
                  new_window.title(new_file)
                  with open(new_file,"r") as file:
                     content = file.read()
-                    
                     text_widget = ctk.CTkTextbox(new_window,
                     wrap=tk.WORD,
                     width=1920,
@@ -389,9 +390,15 @@ class Widgets(ctk.CTkFrame):
                  # file path
                  self.path = filedialog.askopenfile(title="Open File",
                  filetypes=datatypes).name
+                 print(len(files))
+                 print(len(self.used_files))
                  if self.path:
-                     #self.used_files.append(self.path)
-                     self.write_preferences_to_json("other","files",self.path)
+                     if self.max_recent_files > len(files) and self.max_recent_files > len(self.used_files):
+                        self.used_files.append(self.path)
+                        self.write_preferences_to_json("other","files",self.used_files)
+                     else:
+                         print("DEBUG: There are more recent files than allowed.")
+                     print(self.used_files)
                      self.update_file_name(self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
                          content = file.read()
@@ -515,13 +522,18 @@ class Widgets(ctk.CTkFrame):
                 
                 tooltip_1 = CTkToolTip(github_link,message="https://github.com/Moritz344/NeroEditor")
 
+                icon = ctk.CTkLabel(root,text="Icons by Flaticon",font=("opensans",15))
+                icon.place(x=5,y=270)
+
 
             def light_mode():
                 self.fg_color = "white"
+                self.scrollbar.configure(fg_color=self.fg_color)
                 self.text_color = "black"
                 self.update_textbox_font()
             def dark_mode():
                 self.fg_color = "#171614"
+                self.scrollbar.configure(fg_color=self.fg_color)
                 self.text_color = "white"
                 self.update_textbox_font()
             
@@ -551,8 +563,6 @@ class Widgets(ctk.CTkFrame):
                             font=("opensans",15),)
 
                         msg.geometry("+500+300")
-
-                        self.write_preferences_to_json("other","files",self.path)
                         self.update_file_name(self.path)
                         self.count_lines()
 
@@ -591,27 +601,28 @@ class Widgets(ctk.CTkFrame):
                     font=("opensans",20),
                     )
 
-            def open_recent_file() -> None:
+            def open_recent_file(file_path) :
                 try:
-                    with open(self.files,"r",encoding="utf-8") as file:
+                    path = file_path
+                    with open(path,"r",encoding="utf-8") as file:
                         content = file.read()
-                        path_name = self.files.split("/")
-                        path_recent = path_name[-1]
 
-                        self.update_file_name(self.files)
+
+                        self.update_file_name(path)
                         self.textbox.delete(1.0,tk.END)
                         self.textbox.insert(1.0,content)
                         self.count_lines()
-                except Exception:
+                except Exception as e:
                     CTkMessagebox.CTkMessagebox(title="Error",icon="warning",message="That path does not exist.",
                     font=("opensans",20))
+                    print(e)
 
 
-            menu = CTkMenuBar(master,bg_color="#171614",)
-            button_1 = menu.add_cascade("File")
-            button_4 = menu.add_cascade("Settings")
-            button_2 = menu.add_cascade("Help")
-            button_3 = menu.add_cascade("Execute")
+            self.menu = CTkMenuBar(master,bg_color="#171614",)
+            button_1 = self.menu.add_cascade("File")
+            button_4 = self.menu.add_cascade("Settings")
+            button_2 = self.menu.add_cascade("Help")
+            button_3 = self.menu.add_cascade("Execute")
             
             dropdown_1 = CustomDropdownMenu(widget=button_1,)
             dropdown_1.add_option(option="Open",command=open_file)
@@ -620,14 +631,13 @@ class Widgets(ctk.CTkFrame):
             dropdown_1.add_option(option="Save File As",command=save_file)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
-            
 
-            
-
-            
             # Recent File submenu
-            submenu_1 = dropdown_1.add_submenu("Recent File",)
-            submenu_1.add_option(option=f"{files}",command=open_recent_file)
+            self.submenu_1 = dropdown_1.add_submenu("Last Files")
+
+            for file in files:
+                # mit lambda den file path übertragen indem man den aktuellen wert als default argument übergibt
+                self.submenu_1.add_option(f"{file}",command = lambda f=file: open_recent_file(f),)
 
             dropdown_2 = CustomDropdownMenu(widget=button_2)
             dropdown_2.add_option(option="About")
