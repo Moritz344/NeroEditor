@@ -20,7 +20,8 @@ from syntax import SyntaxHighlighting
 from write_to_json import *
 
 # TODO: change cursor
-# TODO: make ui better file info
+# TODO: ask to save file if not saved
+# TODO: CTkFont
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -125,18 +126,13 @@ class Widgets(ctk.CTkFrame):
         return width,height
 
     def file_name(self,window,path,final_icon):
-
-        
-        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,fg_color="#32373b",
+        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,hover=False,fg_color="transparent",
         font=("opensans",15),
         image=final_icon,
         hover_color="#32373b",
         )
         self.update_icon()
         self.file_btn.place(x=0,y=30)
-
-            
-
 
     def update_file_name(self,path) :
         self.path = path
@@ -204,9 +200,6 @@ class Widgets(ctk.CTkFrame):
             write_preferences_to_json("settings","border_spacing",self.border_spacing)
             self.update_textbox_font()
 
-        # sprache ändern
-
-        
         tab_label = ctk.CTkLabel(window,text="Tabs",font=("opensans",25))
         tab_label.place(x=120,y=11)
 
@@ -219,7 +212,6 @@ class Widgets(ctk.CTkFrame):
             scroll_value=5,
             command=change_tabs)
         self.spinbox.place(x=100,y=50)
-        
         self.check_var = ctk.StringVar(value="on")
 
         syntax_label = ctk.CTkLabel(window,text="Syntax Highlighter",font=("opensans",25))
@@ -247,65 +239,57 @@ class Widgets(ctk.CTkFrame):
 
     def file_info(self):
         self.info_window = ctk.CTkToplevel(self)
-        self.info_window.geometry("500x300")
+        self.info_window.geometry("800x550")
         self.info_window.title("File Info")
+        font_size = 60
 
+        self.info_window.minsize(800,550)
+        self.info_window.maxsize(800,550)
 
-        self.info_window.minsize(500,300)
-        self.info_window.maxsize(500,300)
-
+        
 
         try:
-            info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0)
+            if self.path == "<untitled>":
+                raise Exception
+            info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0,)
             info_frame.place(x=0,y=0)
 
-
-            header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",40),)
-            header.place(x=180,y=5)
-
-
-            self.filetype_label = ctk.CTkLabel(info_frame,
-            text=f"Filetype: \t\t{self.current_filetype}",
-            width=0,
-            height=0,
-            font=("opensans",standard_font_size))
+            file_daten_frame = ctk.CTkFrame(self.info_window,width=800,height=400,corner_radius=0,fg_color="transparent")
+            file_daten_frame.place(x=0,y=200)
             
-            self.filetype_label.place(x=10,y=110)
+            file_img = ctk.CTkImage(Image.open("assets/folder.png"),size=(100,100))
+            file_label = ctk.CTkLabel(info_frame,image=file_img,text="",)
+            file_label.place(x=140,y=50)
+            header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",100),)
+            header.pack(side=TOP,padx=250,pady=50,anchor="n")
 
-            self.path_name = self.path.split("/")
-            self.path_label = ctk.CTkLabel(info_frame,
-            text=f"Path: \t\t{self.path_name[-2]}/{self.path_name[-1]}",
-            font=("opensans",standard_font_size))
-            self.path_label.place(x=10,y=140)
+            trennlinie = ctk.CTkFrame(self.info_window,width=800,height=5,fg_color='#59626C')
 
-            
             try:
                 self.filesize = os.path.getsize(self.path)
             except Exception:
                 pass
+            self.path_name = self.path.split("/")
 
+            trennlinie.place(x=0,y=200)
 
-            self.filesize_label = ctk.CTkLabel(info_frame,
-            text=f"Filesize: \t\t{self.filesize}B",
-            font=("opensans",standard_font_size),
-            )
-            self.filesize_label.place(x=10,y=170)
-            self.counter = ctk.CTkLabel(info_frame,text=f"Lines: \t\t{self.current_lines}",
-            width=0,
-            height=0,
-            font=("opensans",standard_font_size))
+            self.daten = ctk.CTkTextbox(file_daten_frame,
+            font=("opensans",font_size),width=800,height=600)
+            
+            self.daten.tag_config("filetype",foreground="#95b8d1")
+            self.daten.tag_config("path_tag",foreground="pink")
+
+            self.daten.place(x=0,y=0)
+            self.daten.insert("0.0",f" \t{self.current_filetype}\n","filetype")
+            self.daten.insert("0.0","Filetype ")
+            self.daten.insert("0.0",f"Filesize \t{self.filesize}B\n")
+            self.daten.insert("0.0",f" \t{self.path_name[-1]}\n","path_tag")
+            self.daten.insert("0.0","Path")
+            self.daten.insert("0.0",f"Lines      \t{self.current_lines}\n")
+            self.daten.configure(state="disabled")
             self.count_lines()
-            self.counter.place(x=10,y=80)
 
 
-            tooltip_1 = CTkToolTip(self.path_label,message=f"{self.path}")
-            tooltip_2 = CTkToolTip(self.filetype_label,
-            message=f"{self.current_filetype}")
-
-            tooltip_3 = CTkToolTip(self.filesize_label,
-            message=f"{self.filesize}B (that's massive)")
-            tooltip_4 = CTkToolTip(self.counter,
-            message=f"{self.current_lines}")
         except Exception as e:
             print("DEBUG:",e)
             self.info_window.destroy()

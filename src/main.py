@@ -14,7 +14,7 @@ class App(ctk.CTk):
         self.minsize(1000,600)
         self.title(project_name)
         arrow = "@Normal.cur"
-        self.configure(fg_color="#32373b",cursor=arrow,)
+        self.configure(cursor=arrow,)
 
         
 
