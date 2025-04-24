@@ -16,27 +16,29 @@ class App(ctk.CTk):
         arrow = "@Normal.cur"
         self.configure(cursor=arrow,)
 
-        
+        w = Widgets(self)
 
         def on_closing():
-            msg = CTkMessagebox.CTkMessagebox(
-            self,
-            icon="warning",
-            title="Exit",
-            option_1="No",
-            option_2="Yes",
-            text_color="white",
-            message="Are you sure you saved your file?",
-            font=("opensans",20),
-                    )
-            response = msg.get()
-            if response == "Yes":
+            if not w.saving:
+                msg = CTkMessagebox.CTkMessagebox(
+                self,
+                icon="warning",
+                title="Exit",
+                option_1="No",
+                option_2="Yes",
+                text_color="white",
+                message="Are you sure you saved your file?",
+                font=("opensans",20),
+                        )
+                response = msg.get()
+                if response == "Yes":
+                    self.destroy()
+            else:
                 self.destroy()
 
 
-        self.protocol("WM_DELETE_WINDOW",on_closing)
 
-        Widgets(self)
+        self.protocol("WM_DELETE_WINDOW",on_closing)
 
         self.mainloop()
 

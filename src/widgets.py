@@ -10,13 +10,11 @@ from tkinter import simpledialog
 import sys
 from CTkListbox import *
 from settings import *
-from tkinter import messagebox
-import json
-from PIL import Image,ImageTk
+from PIL import Image
 from CTkToolTip import *
 from CTkMenuBar import *
 from CTkScrollableDropdown import *
-from syntax import SyntaxHighlighting 
+from syntax import SyntaxHighlighting
 from write_to_json import *
 
 # TODO: change cursor
@@ -35,6 +33,7 @@ class Widgets(ctk.CTkFrame):
         self.files = files
         self.used_files = []
         self.max_recent_files = 5
+        self.saving = None
         
         self.textbox = None
         self.scrollbar = None
@@ -237,6 +236,7 @@ class Widgets(ctk.CTkFrame):
             command=change_border_spacing)
         self.spinbox_2.place(x=100,y=250)
 
+
     def file_info(self):
         self.info_window = ctk.CTkToplevel(self)
         self.info_window.geometry("800x550")
@@ -365,6 +365,7 @@ class Widgets(ctk.CTkFrame):
                      print(self.used_files)
                      self.update_file_name(self.path)
                      with open(self.path,"r",encoding="utf-8") as file:
+                         self.saving = False
                          content = file.read()
                          self.textbox.delete(1.0,tk.END)
                          self.textbox.insert(tk.END,content)
@@ -380,12 +381,11 @@ class Widgets(ctk.CTkFrame):
                         with open(self.path,"w",encoding="utf-8") as file:
                             content = self.textbox.get(1.0,tk.END)
                             file.write(content)
+                            self.saving = True
                             CTkMessagebox.CTkMessagebox(title="Saved File",icon="check",
                             message=f"Saved File successfuly in {self.path}")
-                        
                 except Exception as e:
                     print("oof",e)
-                
             def save_file():
                 try:
                     self.path = filedialog.asksaveasfile(title="Save File",
