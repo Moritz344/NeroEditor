@@ -17,15 +17,13 @@ from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting
 from write_to_json import *
 
-# TODO: change cursor
-# TODO: ask to save file if not saved
-# TODO: CTkFont
+# TODO: About page ui überarbeiten
+# TODO: file info tab: anzahl an buchstaben bedenken bei path angabe
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
 
-        self.hand_cursor = "@hand.cur"
         self.arrow_cursor = "@Normal.cur"
         self.font = font
         self.colorscheme = colorscheme
@@ -46,6 +44,10 @@ class Widgets(ctk.CTkFrame):
         self.min_font_size = min_font_size
         self.font_art = "normal"
 
+        self.nerdfont_1 = "0xProto Nerd Font Propo"
+        self.nerdfont_2 = "FiraMono NerdFont"
+        self.nerdfont_3 = "Hack Nerd Font"
+        self.nerdfont_4 = "BigBlueTerm437 Nerd Font Mono"
 
         self.anzahl_tabs = tabs
         self.syntax = "on"
@@ -184,6 +186,10 @@ class Widgets(ctk.CTkFrame):
         window.minsize(300,350)
         window.maxsize(300,350)
 
+        # header
+        settings_img = ctk.CTkImage(Image.open("assets/adjustment.png"),size=(50,50))
+        ctk.CTkLabel(window,text=" Settings",compound="left",image=settings_img,font=("Arial",50)).place(x=30,y=5)
+
         def change_tabs(value):
             self.anzahl_tabs = value
             write_preferences_to_json("settings","tabs",self.anzahl_tabs)
@@ -200,7 +206,7 @@ class Widgets(ctk.CTkFrame):
             self.update_textbox_font()
 
         tab_label = ctk.CTkLabel(window,text="Tabs",font=("opensans",25))
-        tab_label.place(x=120,y=11)
+        tab_label.place(x=30,y=95)
 
 
         self.spinbox = CTkSpinbox(window,
@@ -210,22 +216,21 @@ class Widgets(ctk.CTkFrame):
             step_value=5,
             scroll_value=5,
             command=change_tabs)
-        self.spinbox.place(x=100,y=50)
+        self.spinbox.place(x=170,y=90)
         self.check_var = ctk.StringVar(value="on")
 
-        syntax_label = ctk.CTkLabel(window,text="Syntax Highlighter",font=("opensans",25))
-        syntax_label.place(x=60,y=111)
+        syntax_label = ctk.CTkLabel(window,text="Syntax",font=("opensans",25))
+        syntax_label.place(x=30,y=150)
 
         CTkToolTip(syntax_label,delay=0.3,message="Only Python supported")
 
         self.checkbutton = ctk.CTkCheckBox(window,text=f"on/off",
-        variable=self.check_var,onvalue="on",offvalue="off",command=change_syntax
-                                           )
-        self.checkbutton.place(x=100,y=150)
+        variable=self.check_var,onvalue="on",offvalue="off",command=change_syntax)
+        self.checkbutton.place(x=170,y=153)
         CTkToolTip(self.checkbutton,delay=0.3,message="Only Python supported")
 
-        border_spacing_label = ctk.CTkLabel(window,text="Border Spacing",font=("opensans",25))
-        border_spacing_label.place(x=60,y=211)
+        border_spacing_label = ctk.CTkLabel(window,text="Spacing",font=("opensans",25))
+        border_spacing_label.place(x=30,y=205)
 
         self.spinbox_2 = CTkSpinbox(window,
             start_value=self.border_spacing,
@@ -234,27 +239,28 @@ class Widgets(ctk.CTkFrame):
             step_value=2,
             scroll_value=5,
             command=change_border_spacing)
-        self.spinbox_2.place(x=100,y=250)
+        self.spinbox_2.place(x=170,y=198)
 
 
     def file_info(self):
         self.info_window = ctk.CTkToplevel(self)
-        self.info_window.geometry("800x550")
+        self.info_window.geometry("850x600")
+        self.info_window.minsize(850,600)
+        self.info_window.maxsize(850,600)
         self.info_window.title("File Info")
-        font_size = 60
+        font_size = 50
+        font_family= ctk.CTkFont(family="opensans",size=font_size)
 
-        self.info_window.minsize(800,550)
-        self.info_window.maxsize(800,550)
 
         
 
         try:
             if self.path == "<untitled>":
                 raise Exception
-            info_frame = ctk.CTkFrame(self.info_window,width=500,height=600,corner_radius=0,)
+            info_frame = ctk.CTkFrame(self.info_window,width=1500,height=600,corner_radius=0,)
             info_frame.place(x=0,y=0)
 
-            file_daten_frame = ctk.CTkFrame(self.info_window,width=800,height=400,corner_radius=0,fg_color="transparent")
+            file_daten_frame = ctk.CTkFrame(self.info_window,width=1500,height=400,corner_radius=0,fg_color="transparent")
             file_daten_frame.place(x=0,y=200)
             
             file_img = ctk.CTkImage(Image.open("assets/folder.png"),size=(100,100))
@@ -263,7 +269,7 @@ class Widgets(ctk.CTkFrame):
             header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",100),)
             header.pack(side=TOP,padx=250,pady=50,anchor="n")
 
-            trennlinie = ctk.CTkFrame(self.info_window,width=800,height=5,fg_color='#59626C')
+            trennlinie = ctk.CTkFrame(self.info_window,width=1500,height=5,fg_color='#59626C')
 
             try:
                 self.filesize = os.path.getsize(self.path)
@@ -274,7 +280,7 @@ class Widgets(ctk.CTkFrame):
             trennlinie.place(x=0,y=200)
 
             self.daten = ctk.CTkTextbox(file_daten_frame,
-            font=("opensans",font_size),width=800,height=600)
+            font=font_family,width=850,height=600)
             
             self.daten.tag_config("filetype",foreground="#95b8d1")
             self.daten.tag_config("path_tag",foreground="pink")
@@ -283,8 +289,10 @@ class Widgets(ctk.CTkFrame):
             self.daten.insert("0.0",f" \t{self.current_filetype}\n","filetype")
             self.daten.insert("0.0","Filetype ")
             self.daten.insert("0.0",f"Filesize \t{self.filesize}B\n")
-            self.daten.insert("0.0",f" \t{self.path_name[-1]}\n","path_tag")
+
+            self.daten.insert("0.0",f" \t{self.path_name[-2]}/{self.path_name[-1]}\n","path_tag")
             self.daten.insert("0.0","Path")
+
             self.daten.insert("0.0",f"Lines      \t{self.current_lines}\n")
             self.daten.configure(state="disabled")
             self.count_lines()
@@ -306,7 +314,6 @@ class Widgets(ctk.CTkFrame):
         tabs=self.anzahl_tabs,
         border_spacing=self.border_spacing,
         font=(self.font,self.font_size,self.font_art),
-        cursor=self.arrow_cursor,
         activate_scrollbars=False,
         )
         self.textbox.place(x=0,y=60)
@@ -407,24 +414,37 @@ class Widgets(ctk.CTkFrame):
             def update_preferences():
                 root = ctk.CTkToplevel(self)
                 root.title("Preferences")
-                root.geometry("300x200")
+                root.geometry("400x300")
 
-                root.minsize(300,200)
-                root.maxsize(300,200)
+                root.minsize(400,300)
+                root.maxsize(400,300)
+                
+                pref_img = ctk.CTkImage(Image.open("assets/colour.png"),size=(50,50))
 
-                header = ctk.CTkLabel(root,text="Preferences",font=("opensans",30)).place(x=70,y=5)
+                ctk.CTkLabel(root,text=" Preferences",compound="left",image=pref_img,font=("Arial",50)).place(x=30,y=5)
+
+                # trennlinie
+                ctk.CTkFrame(root,width=400,height=5,fg_color="#59626C").place(x=0,y=65)
 
 
                 def change_font(selected):
-                    self.font = selected
-                    write_preferences_to_json("preferences","font",selected)
-                    self.update_textbox_font()
+                    try:
+                        self.font = selected
+                        optionmenu_1.set(self.font)
+                        write_preferences_to_json("preferences","font",selected)
+                        self.update_textbox_font()
+                    except Exception as e:
+                        CTkMessagebox.CTkMessagebox(message="This shouldnt happen.Please report this",icon="warning")
+                        print("DEBUG:",e)
 
-                values = ["Comic Sans MS","Arial","opensans",]
+                values = ["Comic Sans MS",
+                          "Arial","opensans",self.nerdfont_1,self.nerdfont_2,self.nerdfont_3,
+                          "minecraft",self.nerdfont_4,
+                ]
 
                 optionmenu_1= ctk.CTkOptionMenu(root,width=240)
-                optionmenu_1.set("Font")
-                optionmenu_1.place(x=25,y=70)
+                optionmenu_1.set(self.font)
+                optionmenu_1.place(x=80,y=130)
 
 
                 def change_bg(selected):
@@ -449,9 +469,8 @@ class Widgets(ctk.CTkFrame):
 
 
                 optionmenu_2 = ctk.CTkOptionMenu(root,width=240)
-                optionmenu_2.place(x=25,y=120)
+                optionmenu_2.place(x=80,y=170)
                 optionmenu_2.set("BG color")
-                
                 bg_colors = ["Dark Slate Grey","Pumpkin","Vermilton","Last Used","Standard"]
 
                 CTkScrollableDropdown(optionmenu_1,values=values,command=change_font)
@@ -597,7 +616,7 @@ class Widgets(ctk.CTkFrame):
             command=self.open_new_file)
 
             # Recent File submenu
-            self.submenu_1 = dropdown_1.add_submenu("Last Files")
+            self.submenu_1 = dropdown_1.add_submenu("Recent Files")
 
             for file in files:
                 # mit lambda den file path übertragen indem man den aktuellen wert als default argument übergibt
