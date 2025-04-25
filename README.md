@@ -29,11 +29,11 @@
 - change font size
 - change colorscheme
 - change dark/light mode
-- See Recent File
+- See Recent Files
 - See Current File
 - Ctrl+z(undo)
 - Ctrl+y(redo)
-- line counter
+- file info window
 
 
 # Requirements
