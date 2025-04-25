@@ -40,9 +40,7 @@
 - Python 3.11
 - tkinter
 - customtkinter
-- CTkListbox
-- CTkMessagebox
-- CTkToolTip
+- pillow
 
 
 
