@@ -27,7 +27,7 @@ class App(ctk.CTk):
                 option_1="No",
                 option_2="Yes",
                 text_color="white",
-                message="Are you sure you saved your file?",
+                message="You did not save your file. Do you still want to quit?",
                 font=("opensans",20),
                         )
                 response = msg.get()
