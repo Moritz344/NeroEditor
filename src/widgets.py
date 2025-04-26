@@ -16,6 +16,7 @@ from CTkMenuBar import *
 from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting
 from write_to_json import *
+from ctkcomponents import *
 
 # TODO: About page ui überarbeiten
 # TODO: file info tab: anzahl an buchstaben bedenken bei path angabe
@@ -86,18 +87,47 @@ class Widgets(ctk.CTkFrame):
 
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
-    def save_file_only(self):
+    def save_file_only(self,window):
                 try:
                     if self.path != "<untitled>":
                         with open(self.path,"w",encoding="utf-8") as file:
                             content = self.textbox.get(1.0,tk.END)
                             file.write(content)
                             self.saving = True
-                            CTkMessagebox.CTkMessagebox(title="Saved File",icon="check",
-                            message=f"Saved File successfuly in {self.path}")
-                except Exception as e:
-                    print("oof",e)
-    def open_file(self):
+                            path_name = self.path.split("/")
+                            CTkNotification(master=window,state="info",message=f"Saved file: {path_name[-1]}")
+
+                except TypeError:
+                    print("cringe")
+
+    def run_python_file(self) -> None:
+                try:
+                    with open(self.path,"r",encoding="utf-8") as file:
+                        content = file.read()
+
+                    try:
+                        self.path_name = self.path.split(".")
+                        if sys.platform == "win32" and self.path_name[-1] == "py":
+                            subprocess.run(["python",self.path],
+                            creationflags=subprocess.CREATE_NEW_CONSOLE)
+                        else:
+                            CTkMessagebox.CTkMessagebox(title="Warning",
+                            message=f"{self.current_filetype} is not a Python file!",
+                            icon="warning",
+                            font=("opensans",20),
+                            )
+
+                    except Exception as e:
+                        print("Fehler beim Öffnen des Terminals.",e)
+
+                except Exception:
+                    print("No Python file found")
+                    CTkMessagebox.CTkMessagebox(title="Warning",
+                    message="No Python file found",
+                    icon="warning",
+                    font=("opensans",20),
+                    )
+    def open_file(self,window):
         try:
             # file path
             self.path = filedialog.askopenfile(title="Open File",
@@ -118,11 +148,12 @@ class Widgets(ctk.CTkFrame):
                     self.textbox.delete(1.0,tk.END)
                     self.textbox.insert(tk.END,content)
                     self.count_lines()
+                    
+                    self.path = self.path.split("/")
+                    CTkNotification(window,state="info",message=f"...{self.path[-3]}/{self.path[-2]}/{self.path[-1]}",)
 
-                    CTkMessagebox.CTkMessagebox(title="Opened File",icon="check",
-                    message=f"Opened File successfuly in {self.path}")
         except Exception as e:
-                    print("please please please",e)
+                    print(e)
     def ask_save_file(self):
         try:
             self.path = filedialog.asksaveasfile(title="Save File",
@@ -136,7 +167,7 @@ class Widgets(ctk.CTkFrame):
 
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
-    def new_file(self):
+    def new_file(self,window):
             file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=datatypes)
@@ -151,17 +182,8 @@ class Widgets(ctk.CTkFrame):
 
                     self.textbox.delete("1.0",tk.END)
                     self.textbox.insert(tk.END,file_content)
-
-                    msg =CTkMessagebox.CTkMessagebox(
-                        self,
-                        icon="check",
-                        title="New File",
-                        option_1="Ok",
-                        text_color="white",
-                        message=f"Your file got created sucessfuly in: {file_path}",
-                        font=("opensans",15),)
-
-                    msg.geometry("+500+300")
+                    self.path = self.path.split("/")
+                    CTkNotification(master=window,state="info",message=f"Created new file {self.path[-1]}")
                     self.update_file_name(self.path)
                     self.count_lines()
 
@@ -210,34 +232,65 @@ class Widgets(ctk.CTkFrame):
         hover_color="#32373b",
         )
 
+
         trennstrich = ctk.CTkFrame(window,width=1920,height=2,fg_color="#59626C")
         trennstrich_2 = ctk.CTkLabel(window,text="|",font=("opensans",20),text_color="grey")
+        trennstrich_3 = ctk.CTkLabel(window,text="|",font=("opensans",20),text_color="grey")
+        trennstrich_4 = ctk.CTkLabel(window,text="|",font=("opensans",20),text_color="grey")
 
         # -- icons for buttons
         save_img = ctk.CTkImage(Image.open("assets/save.png"),size=(20,20))
         new_file_img = ctk.CTkImage(Image.open("assets/new_file.png"),size=(20,20))
         open_img = ctk.CTkImage(Image.open("assets/open_file.png"),size=(20,20))
-
+        undo_img = ctk.CTkImage(Image.open("assets/undo.png"),size=(20,20))
+        redo_img = ctk.CTkImage(Image.open("assets/redo.png"),size=(20,20))
+        build_img = ctk.CTkImage(Image.open("assets/build.png"))
         # --
 
         # - buttons
         save_btn = ctk.CTkButton(window,text="",image=save_img,width=20,height=20,fg_color="transparent",
-        command=self.save_file_only, 
+        command=lambda: self.save_file_only(window), 
         hover_color="#32373b",)
 
+        undo_btn = ctk.CTkButton(window,text="",image=undo_img,width=10,height=10,fg_color="transparent",command=self.undo,
+        font=("opensans",15))
+
+        redo_btn = ctk.CTkButton(window,text="",image=redo_img,width=10,height=10,fg_color="transparent",command=self.redo,
+        font=("opensans",15),)
+
+        build_btn = ctk.CTkButton(window,text="",image=build_img,width=10,height=10,fg_color="transparent",
+        command=self.run_python_file,hover_color="#32373b",
+        font=("opensans",15),)
+
         open_btn = ctk.CTkButton(window,text="",image=open_img,width=20,height=20,fg_color="transparent",
-        command=self.open_file, hover_color="#32373b")
+        command=lambda: self.open_file(window), hover_color="#32373b")
+
         
         new_file_btn = ctk.CTkButton(window,text="",image=new_file_img,width=20,height=20,fg_color="transparent",
-        command=self.new_file,hover_color="#32373b")
+        command=lambda: self.new_file(window),hover_color="#32373b")
+
+        # - tooltips
+        CTkToolTip(save_btn,message="Save file",delay=0.2)
+        CTkToolTip(new_file_btn,message="Make New File",delay=0.2)
+        CTkToolTip(open_btn,message="Open File",delay=0.3)
+        CTkToolTip(build_btn,message="Run Python File",delay=0.2)
+        CTkToolTip(undo_btn,message="Undo",delay=0.2)
+        CTkToolTip(redo_btn,message="Redo",delay=0.2)
+
+        # -
 
         save_btn.place(x=5,y=30)
         new_file_btn.place(x=50,y=30)
         open_btn.place(x=95,y=30)
+        undo_btn.place(x=150,y=30)
+        redo_btn.place(x=190,y=30)
+        build_btn.place(x=235,y=30)
         self.update_icon()
-        self.file_btn.place(x=150,y=30)
+        self.file_btn.place(x=275,y=30)
         trennstrich.place(x=0,y=58)
         trennstrich_2.place(x=140,y=30)
+        trennstrich_3.place(x=225,y=30)
+        trennstrich_4.place(x=270,y=30)
 
 
     def update_file_name(self,path) :
@@ -558,7 +611,7 @@ class Widgets(ctk.CTkFrame):
                 font=("opensans",10,),image=github_icon)
                 github_link.place(x=600,y=250)
                 
-                tooltip_1 = CTkToolTip(github_link,message="https://github.com/Moritz344/NeroEditor")
+                CTkToolTip(github_link,message="https://github.com/Moritz344/NeroEditor")
 
                 icon = ctk.CTkLabel(root,text="Icons by Flaticon",font=("opensans",15))
                 icon.place(x=5,y=270)
@@ -574,48 +627,14 @@ class Widgets(ctk.CTkFrame):
                 self.scrollbar.configure(fg_color=self.fg_color)
                 self.text_color = "white"
                 self.update_textbox_font()
-            
 
-
-
-
-
-
-            def run_python_file() -> None:
-
-                try:
-                    with open(self.path,"r",encoding="utf-8") as file:
-                        content = file.read()
-
-                    try:
-                        self.path_name = self.path.split(".")
-                        if sys.platform == "win32" and self.path_name[-1] == "py":
-                            subprocess.run(["python",self.path],
-                            creationflags=subprocess.CREATE_NEW_CONSOLE)
-                        else:
-                            CTkMessagebox.CTkMessagebox(title="Warning",
-                            message=f"{self.current_filetype} is not a Python file!",
-                            icon="warning",
-                            font=("opensans",20),
-                            )
-
-                    except Exception as e:
-                        print("Fehler beim Öffnen des Terminals.",e)
-
-                except Exception:
-                    print("No Python file found")
-                    CTkMessagebox.CTkMessagebox(title="Warning",
-                    message="No Python file found",
-                    icon="warning",
-                    font=("opensans",20),
-                    )
-
-            def open_recent_file(file_path) :
+            def open_recent_file(file_path,window):
                 try:
                     path = file_path
                     with open(path,"r",encoding="utf-8") as file:
                         content = file.read()
-
+                        path_name = path.split("/")
+                        CTkNotification(master=window,state="info",message=f"Opened Recent File: {path_name[-1]}")
 
                         self.update_file_name(path)
                         self.textbox.delete(1.0,tk.END)
@@ -634,9 +653,9 @@ class Widgets(ctk.CTkFrame):
             button_3 = self.menu.add_cascade("Execute", hover_color="#32373b")
             
             dropdown_1 = CustomDropdownMenu(widget=button_1,hover_color="#32373b")
-            dropdown_1.add_option(option="Open",command=self.open_file)
-            dropdown_1.add_option(option="Save ",command=self.save_file_only)
-            dropdown_1.add_option(option="New File",command=self.new_file)
+            dropdown_1.add_option(option="Open",command=lambda: self.open_file(master))
+            dropdown_1.add_option(option="Save ",command=lambda: self.save_file_only(master))
+            dropdown_1.add_option(option="New File",command=lambda: self.new_file(master))
             dropdown_1.add_option(option="Save File As",command=self.ask_save_file)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
@@ -645,8 +664,7 @@ class Widgets(ctk.CTkFrame):
             self.submenu_1 = dropdown_1.add_submenu("Recent Files")
 
             for file in files:
-                # mit lambda den file path übertragen indem man den aktuellen wert als default argument übergibt
-                self.submenu_1.add_option(f"{file}",command = lambda f=file: open_recent_file(f),)
+                self.submenu_1.add_option(f"{file}",command = lambda f=file: open_recent_file(f,master))
 
             dropdown_2 = CustomDropdownMenu(widget=button_2)
             dropdown_2.add_option(option="About")
@@ -659,7 +677,7 @@ class Widgets(ctk.CTkFrame):
 
             dropdown_3 = CustomDropdownMenu(widget=button_3)
             dropdown_3.add_option(option="Run Python Script",
-            command=run_python_file)
+            command=self.run_python_file)
 
             dropdown_4 = CustomDropdownMenu(widget=button_4)
 
