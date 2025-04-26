@@ -24,5 +24,5 @@ def get_data_from_json() -> str:
 
             return font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes,tabs,border_spacing
             
-font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes,tabs,border_spacing = get_data_from_json()
+font,colorscheme,standard_font_size,max_font_size,min_font_size,path,background_color,files,project_name,string,keyword,comment,datatypes,tabs,border_spacing= get_data_from_json()
 

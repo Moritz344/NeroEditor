@@ -19,12 +19,14 @@ from write_to_json import *
 
 # TODO: About page ui überarbeiten
 # TODO: file info tab: anzahl an buchstaben bedenken bei path angabe
+# TODO: tooltips bei save icon und so weiter
+# TODO: file info tab: nicht richtig gecentered
+# TODO: villeicht messageboxen löschen wenn datei erstellt geöffnet oder gesichert. setting zum ein und ausschalten.
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
         super().__init__(master=window,)
 
-        self.arrow_cursor = "@Normal.cur"
         self.font = font
         self.colorscheme = colorscheme
 
@@ -60,8 +62,6 @@ class Widgets(ctk.CTkFrame):
         self.path = path
         self.text_color = "white"
         self.fg_color = background_color
-        self.menu_func(window)
-        self.create_textbox(window)
         
         
 
@@ -75,8 +75,10 @@ class Widgets(ctk.CTkFrame):
         self.javascript_icon = ctk.CTkImage(light_image=Image.open("assets/js.png"),size=(20,20))
         self.css_icon = ctk.CTkImage(light_image=Image.open("assets/css.png"),size=(20,20))
         self.csv_icon = ctk.CTkImage(light_image=Image.open("assets/csv.png"),size=(20,20))
-        self.file_name(window,self.path,self.final_icon)
+        self.file_name(window,self.path,self.final_icon,)
 
+        self.menu_func(window)
+        self.create_textbox(window)
 
         # gedrückte tasten
         self.pressed_keys = set()
@@ -84,10 +86,85 @@ class Widgets(ctk.CTkFrame):
 
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
-        
-            
+    def save_file_only(self):
+                try:
+                    if self.path != "<untitled>":
+                        with open(self.path,"w",encoding="utf-8") as file:
+                            content = self.textbox.get(1.0,tk.END)
+                            file.write(content)
+                            self.saving = True
+                            CTkMessagebox.CTkMessagebox(title="Saved File",icon="check",
+                            message=f"Saved File successfuly in {self.path}")
+                except Exception as e:
+                    print("oof",e)
+    def open_file(self):
+        try:
+            # file path
+            self.path = filedialog.askopenfile(title="Open File",
+            filetypes=datatypes).name
+            print(len(files))
+            print(len(self.used_files))
+            if self.path:
+                if self.max_recent_files > len(files) and self.max_recent_files > len(self.used_files):
+                   self.used_files.append(self.path)
+                   write_preferences_to_json("other","files",self.used_files)
+                else:
+                    print("DEBUG: There are more recent files than allowed.")
+                print(self.used_files)
+                self.update_file_name(self.path)
+                with open(self.path,"r",encoding="utf-8") as file:
+                    self.saving = False
+                    content = file.read()
+                    self.textbox.delete(1.0,tk.END)
+                    self.textbox.insert(tk.END,content)
+                    self.count_lines()
 
-        
+                    CTkMessagebox.CTkMessagebox(title="Opened File",icon="check",
+                    message=f"Opened File successfuly in {self.path}")
+        except Exception as e:
+                    print("please please please",e)
+    def ask_save_file(self):
+        try:
+            self.path = filedialog.asksaveasfile(title="Save File",
+            filetypes=datatypes).name
+
+            if self.path:
+                self.update_file_name(self.path)
+                with open(self.path,"w",encoding="utf-8") as file:
+                    content = self.textbox.get(1.0,tk.END)
+                    file.write(content) 
+
+        except Exception as e:
+               print("AHHHHHHHHHHHHHHH",e)
+    def new_file(self):
+            file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=datatypes)
+
+
+            if file_path:
+                with open(file_path,"w+") as file:
+                    file_content = file.read()
+                    self.path = file_path
+                    self.update_file_name(self.path)
+
+
+                    self.textbox.delete("1.0",tk.END)
+                    self.textbox.insert(tk.END,file_content)
+
+                    msg =CTkMessagebox.CTkMessagebox(
+                        self,
+                        icon="check",
+                        title="New File",
+                        option_1="Ok",
+                        text_color="white",
+                        message=f"Your file got created sucessfuly in: {file_path}",
+                        font=("opensans",15),)
+
+                    msg.geometry("+500+300")
+                    self.update_file_name(self.path)
+                    self.count_lines()
+
 
     def update_icon(self):
         self.path_end = self.path.split(".")
@@ -127,13 +204,41 @@ class Widgets(ctk.CTkFrame):
         return width,height
 
     def file_name(self,window,path,final_icon):
-        self.file_btn = ctk.CTkButton(window,text=path,corner_radius=0,hover=False,fg_color="transparent",
+        self.file_btn = ctk.CTkButton(window,text=f"{path}",fg_color="transparent",
         font=("opensans",15),
         image=final_icon,
         hover_color="#32373b",
         )
+
+        trennstrich = ctk.CTkFrame(window,width=1920,height=2,fg_color="#59626C")
+        trennstrich_2 = ctk.CTkLabel(window,text="|",font=("opensans",20),text_color="grey")
+
+        # -- icons for buttons
+        save_img = ctk.CTkImage(Image.open("assets/save.png"),size=(20,20))
+        new_file_img = ctk.CTkImage(Image.open("assets/new_file.png"),size=(20,20))
+        open_img = ctk.CTkImage(Image.open("assets/open_file.png"),size=(20,20))
+
+        # --
+
+        # - buttons
+        save_btn = ctk.CTkButton(window,text="",image=save_img,width=20,height=20,fg_color="transparent",
+        command=self.save_file_only, 
+        hover_color="#32373b",)
+
+        open_btn = ctk.CTkButton(window,text="",image=open_img,width=20,height=20,fg_color="transparent",
+        command=self.open_file, hover_color="#32373b")
+        
+        new_file_btn = ctk.CTkButton(window,text="",image=new_file_img,width=20,height=20,fg_color="transparent",
+        command=self.new_file,hover_color="#32373b")
+
+        save_btn.place(x=5,y=30)
+        new_file_btn.place(x=50,y=30)
+        open_btn.place(x=95,y=30)
         self.update_icon()
-        self.file_btn.place(x=0,y=30)
+        self.file_btn.place(x=150,y=30)
+        trennstrich.place(x=0,y=58)
+        trennstrich_2.place(x=140,y=30)
+
 
     def update_file_name(self,path) :
         self.path = path
@@ -290,7 +395,7 @@ class Widgets(ctk.CTkFrame):
             self.daten.insert("0.0","Filetype ")
             self.daten.insert("0.0",f"Filesize \t{self.filesize}B\n")
 
-            self.daten.insert("0.0",f" \t{self.path_name[-2]}/{self.path_name[-1]}\n","path_tag")
+            self.daten.insert("0.0",f" \t{self.path_name[-1]}\n","path_tag")
             self.daten.insert("0.0","Path")
 
             self.daten.insert("0.0",f"Lines      \t{self.current_lines}\n")
@@ -356,56 +461,6 @@ class Widgets(ctk.CTkFrame):
                 print(e)
 
     def menu_func(self,master):
-            def open_file():
-                try:
-                 # file path
-                 self.path = filedialog.askopenfile(title="Open File",
-                 filetypes=datatypes).name
-                 print(len(files))
-                 print(len(self.used_files))
-                 if self.path:
-                     if self.max_recent_files > len(files) and self.max_recent_files > len(self.used_files):
-                        self.used_files.append(self.path)
-                        write_preferences_to_json("other","files",self.used_files)
-                     else:
-                         print("DEBUG: There are more recent files than allowed.")
-                     print(self.used_files)
-                     self.update_file_name(self.path)
-                     with open(self.path,"r",encoding="utf-8") as file:
-                         self.saving = False
-                         content = file.read()
-                         self.textbox.delete(1.0,tk.END)
-                         self.textbox.insert(tk.END,content)
-                         self.count_lines()
-
-                         CTkMessagebox.CTkMessagebox(title="Opened File",icon="check",
-                         message=f"Opened File successfuly in {self.path}")
-                except Exception as e:
-                    print("please please please",e)
-            def save():
-                try:
-                    if self.path != "<untitled>":
-                        with open(self.path,"w",encoding="utf-8") as file:
-                            content = self.textbox.get(1.0,tk.END)
-                            file.write(content)
-                            self.saving = True
-                            CTkMessagebox.CTkMessagebox(title="Saved File",icon="check",
-                            message=f"Saved File successfuly in {self.path}")
-                except Exception as e:
-                    print("oof",e)
-            def save_file():
-                try:
-                    self.path = filedialog.asksaveasfile(title="Save File",
-                    filetypes=datatypes).name
-
-                    if self.path:
-                        self.update_file_name(self.path)
-                        with open(self.path,"w",encoding="utf-8") as file:
-                            content = self.textbox.get(1.0,tk.END)
-                            file.write(content) 
-
-                except Exception as e:
-                    print("AHHHHHHHHHHHHHHH",e)
             
 
             def close_file():
@@ -520,35 +575,6 @@ class Widgets(ctk.CTkFrame):
                 self.text_color = "white"
                 self.update_textbox_font()
             
-            def new_file():
-                file_path = filedialog.asksaveasfilename(
-                defaultextension=".txt",
-                filetypes=datatypes)
-
-
-                if file_path:
-                    with open(file_path,"w+") as file:
-                        file_content = file.read()
-                        self.path = file_path
-                        self.update_file_name(self.path)
-
-
-                        self.textbox.delete("1.0",tk.END)
-                        self.textbox.insert(tk.END,file_content)
-
-                        msg =CTkMessagebox.CTkMessagebox(
-                            self,
-                            icon="check",
-                            title="New File",
-                            option_1="Ok",
-                            text_color="white",
-                            message=f"Your file got created sucessfuly in: {file_path}",
-                            font=("opensans",15),)
-
-                        msg.geometry("+500+300")
-                        self.update_file_name(self.path)
-                        self.count_lines()
-
 
 
 
@@ -601,17 +627,17 @@ class Widgets(ctk.CTkFrame):
                     print(e)
 
 
-            self.menu = CTkMenuBar(master,bg_color="#171614",)
-            button_1 = self.menu.add_cascade("File")
-            button_4 = self.menu.add_cascade("Settings")
-            button_2 = self.menu.add_cascade("Help")
-            button_3 = self.menu.add_cascade("Execute")
+            self.menu = CTkMenuBar(master,bg_color=colorscheme,)
+            button_1 = self.menu.add_cascade("File",hover_color="#32373b")
+            button_4 = self.menu.add_cascade("Settings", hover_color="#32373b")
+            button_2 = self.menu.add_cascade("Help", hover_color="#32373b")
+            button_3 = self.menu.add_cascade("Execute", hover_color="#32373b")
             
-            dropdown_1 = CustomDropdownMenu(widget=button_1,)
-            dropdown_1.add_option(option="Open",command=open_file)
-            dropdown_1.add_option(option="Create New",command=new_file)
-            dropdown_1.add_option(option="Save ",command=save)
-            dropdown_1.add_option(option="Save File As",command=save_file)
+            dropdown_1 = CustomDropdownMenu(widget=button_1,hover_color="#32373b")
+            dropdown_1.add_option(option="Open",command=self.open_file)
+            dropdown_1.add_option(option="Save ",command=self.save_file_only)
+            dropdown_1.add_option(option="New File",command=self.new_file)
+            dropdown_1.add_option(option="Save File As",command=self.ask_save_file)
             dropdown_1.add_option(option="Open New File In Window",
             command=self.open_new_file)
 
