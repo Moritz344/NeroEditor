@@ -3,8 +3,7 @@
 
 **NeroEditor** is a simple and flexible text editor with basic features for editing text.
 
-
-![Screenshot_13](https://github.com/user-attachments/assets/3268320e-05b5-4d7c-ae33-27879cafb6cf)
+![Screenshot_14](https://github.com/user-attachments/assets/40cb9241-1fa7-426f-bd53-3c06b6d3158c)
 
 
 # How It Looks 👀
