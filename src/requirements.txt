@@ -1,5 +1,5 @@
 customtkinter
 tk
 pillow
-CTkSpinabox
+CTkSpinbox
 ctkcomponents
