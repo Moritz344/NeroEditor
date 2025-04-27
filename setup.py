@@ -14,7 +14,7 @@ if sys.platform == "win32":
 
 setup(
     name="NeroEditor",
-    version="1.5",
+    version=version,
     description="NeroEditor is a simple and flexible text editor with basic features for editing text.",
     options={"build_exe": {
         "packages": ["customtkinter", "tkinter","PIL","sys","json","CTkSpinbox","ctkcomponents"],
