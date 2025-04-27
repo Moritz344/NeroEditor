@@ -18,11 +18,9 @@ from syntax import SyntaxHighlighting
 from write_to_json import *
 from ctkcomponents import *
 
-# TODO: About page ui überarbeiten
-# TODO: file info tab: anzahl an buchstaben bedenken bei path angabe
-# TODO: tooltips bei save icon und so weiter
-# TODO: file info tab: nicht richtig gecentered
-# TODO: villeicht messageboxen löschen wenn datei erstellt geöffnet oder gesichert. setting zum ein und ausschalten.
+# TODO: Markdown unterstützung vorschau mit markdown und pywebview -> andere datei
+# TODO: Drag and Drop
+
 
 class Widgets(ctk.CTkFrame):
     def __init__(self,window,):
@@ -35,6 +33,7 @@ class Widgets(ctk.CTkFrame):
         self.used_files = []
         self.max_recent_files = 5
         self.saving = None
+        self.version = "v1.5.0"
         
         self.textbox = None
         self.scrollbar = None
@@ -83,10 +82,14 @@ class Widgets(ctk.CTkFrame):
 
         # gedrückte tasten
         self.pressed_keys = set()
+
         
 
         window.bind("<KeyPress>",self.key_press)
         window.bind("<KeyRelease>",self.key_release)
+
+
+
     def save_file_only(self,window):
                 try:
                     if self.path != "<untitled>":
@@ -100,28 +103,26 @@ class Widgets(ctk.CTkFrame):
                 except TypeError:
                     print("cringe")
 
-    def run_python_file(self) -> None:
+    def run_python_file(self,window) :
                 try:
                     with open(self.path,"r",encoding="utf-8") as file:
                         content = file.read()
+                        
+                        full_path = self.path
+                        path_name = full_path.split(".")
+                        if sys.platform == "win32" and path_name[-1] == "py":
+                                subprocess.run(["python3",self.path],
+                                creationflags=subprocess.CREATE_NEW_CONSOLE)
 
-                    try:
-                        self.path_name = self.path.split(".")
-                        if sys.platform == "win32" and self.path_name[-1] == "py":
-                            subprocess.run(["python",self.path],
-                            creationflags=subprocess.CREATE_NEW_CONSOLE)
                         else:
                             CTkMessagebox.CTkMessagebox(title="Warning",
-                            message=f"{self.current_filetype} is not a Python file!",
+                            message=f"{self.current_filetype} is not a Python file! Or you are running on Linux.",
                             icon="warning",
                             font=("opensans",20),
                             )
 
-                    except Exception as e:
-                        print("Fehler beim Öffnen des Terminals.",e)
-
-                except Exception:
-                    print("No Python file found")
+                except Exception as e:
+                    print("No Python file found",e)
                     CTkMessagebox.CTkMessagebox(title="Warning",
                     message="No Python file found",
                     icon="warning",
@@ -148,9 +149,9 @@ class Widgets(ctk.CTkFrame):
                     self.textbox.delete(1.0,tk.END)
                     self.textbox.insert(tk.END,content)
                     self.count_lines()
-                    
-                    self.path = self.path.split("/")
-                    CTkNotification(window,state="info",message=f"...{self.path[-3]}/{self.path[-2]}/{self.path[-1]}",)
+                    file_path = self.path  
+                    file = file_path.split("/")
+                    CTkNotification(window,state="info",message=f"...{file[-3]}/{file[-2]}/{file[-1]}",)
 
         except Exception as e:
                     print(e)
@@ -167,6 +168,9 @@ class Widgets(ctk.CTkFrame):
 
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
+    def markdown_file(self):
+        if self.current_filetype == "Markdown":
+            print("There is an Markdown file.")
     def new_file(self,window):
             file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
@@ -182,8 +186,9 @@ class Widgets(ctk.CTkFrame):
 
                     self.textbox.delete("1.0",tk.END)
                     self.textbox.insert(tk.END,file_content)
-                    self.path = self.path.split("/")
-                    CTkNotification(master=window,state="info",message=f"Created new file {self.path[-1]}")
+                    file_path = self.path
+                    file = file_path.split("/")
+                    CTkNotification(master=window,state="info",message=f"Created new file {file[-1]}")
                     self.update_file_name(self.path)
                     self.count_lines()
 
@@ -208,6 +213,8 @@ class Widgets(ctk.CTkFrame):
         elif self.path_end[-1] == "csv":
             self.current_filetype = "CSV "
             self.file_btn.configure(image=self.csv_icon)
+        elif self.path_end[-1] == "md":
+            self.current_filetype = "Markdown"
         else:
             self.current_filetype = "Textfile"
             self.file_btn.configure(image=self.text_icon)
@@ -259,7 +266,7 @@ class Widgets(ctk.CTkFrame):
         font=("opensans",15),)
 
         build_btn = ctk.CTkButton(window,text="",image=build_img,width=10,height=10,fg_color="transparent",
-        command=self.run_python_file,hover_color="#32373b",
+                                  command=lambda: self.run_python_file(window),hover_color="#32373b",
         font=("opensans",15),)
 
         open_btn = ctk.CTkButton(window,text="",image=open_img,width=20,height=20,fg_color="transparent",
@@ -294,6 +301,7 @@ class Widgets(ctk.CTkFrame):
 
 
     def update_file_name(self,path) :
+
         self.path = path
         path = self.path.split("/")
         #print("Debug:",path)
@@ -301,6 +309,7 @@ class Widgets(ctk.CTkFrame):
         self.path_len = len(path[-1])
         self.update_icon()
         SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax,self.scrollbar)
+        self.markdown_file()
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
        self.check_combination()
@@ -423,9 +432,9 @@ class Widgets(ctk.CTkFrame):
             
             file_img = ctk.CTkImage(Image.open("assets/folder.png"),size=(100,100))
             file_label = ctk.CTkLabel(info_frame,image=file_img,text="",)
-            file_label.place(x=140,y=50)
+            file_label.place(x=180,y=50)
             header = ctk.CTkLabel(info_frame,text="File Info",font=("opensans",100),)
-            header.pack(side=TOP,padx=250,pady=50,anchor="n")
+            header.pack(side=TOP,padx=300,pady=50,anchor="n")
 
             trennlinie = ctk.CTkFrame(self.info_window,width=1500,height=5,fg_color='#59626C')
 
@@ -468,7 +477,7 @@ class Widgets(ctk.CTkFrame):
         text_color=self.text_color,
         fg_color=self.fg_color,
         undo=True,
-        wrap="none",
+        wrap="word",
         tabs=self.anzahl_tabs,
         border_spacing=self.border_spacing,
         font=(self.font,self.font_size,self.font_art),
@@ -588,33 +597,45 @@ class Widgets(ctk.CTkFrame):
 
             def about_window():
                 root = ctk.CTkToplevel(self)
-                root.geometry("350x300")
+                root.geometry("300x200")
                 root.title("About")
-                root.maxsize(650,300)
-                root.minsize(650,300)
+
+                root.minsize(300,200)
+                root.maxsize(300,200)
+
+                frame_1 = ctk.CTkFrame(root,width=300,height=200)
+                frame_1.place(x=0,y=0)
+
                 try:
-                    nero_image = ctk.CTkImage(Image.open("assets/nero.png"),size=(80,80))
-                    nero_label = ctk.CTkLabel(root,text="",image=nero_image)
-                    nero_label.place(x=279,y=60)
+                    nero_image = ctk.CTkImage(Image.open("assets/nero.png"),size=(100,100))
+                    nero_label = ctk.CTkLabel(frame_1,text="",image=nero_image)
+                    nero_label.place(x=10,y=10)
                 except Exception as e:
                     print(e)
-                expl = "NeroEditor is a minimalistic \neditor written in python"
-                ctk.CTkLabel(master=root,
-                text="NeroEditor",#
-                font=("opensans",30)).place(x=250,y=10)
-                ctk.CTkLabel(root,
-                text=expl,
-                font=("opensans",standard_font_size)).place(x=170,y=150)
+
+                ctk.CTkLabel(master=frame_1,
+                    text="NeroEditor",#
+                    font=("opensans",30)).place(x=120,y=20)
+
+                ctk.CTkLabel(frame_1,
+                    text=self.version,
+                    font=("opensans",standard_font_size)).place(x=120,y=55)
                 
-                github_icon = ctk.CTkImage(Image.open("assets/github_icon.png"),size=(35,35))
-                github_link = ctk.CTkLabel(root,text="",
+                github_icon = ctk.CTkImage(Image.open("assets/github_icon.png"),size=(50,50))
+                github_link = ctk.CTkLabel(frame_1,text="",
                 font=("opensans",10,),image=github_icon)
-                github_link.place(x=600,y=250)
+                github_link.place(x=10,y=140)
+
+                kofi_img = ctk.CTkImage(Image.open("assets/mug.png"),size=(50,50))
+                kofi_label = ctk.CTkLabel(frame_1,text="",image=kofi_img,)
+                kofi_label.place(x=80,y=140)
                 
                 CTkToolTip(github_link,message="https://github.com/Moritz344/NeroEditor")
+                CTkToolTip(kofi_label,message="https://ko-fi.com/moritz344")
 
-                icon = ctk.CTkLabel(root,text="Icons by Flaticon",font=("opensans",15))
-                icon.place(x=5,y=270)
+                icon = ctk.CTkLabel(frame_1,text="Icons by Flaticon",font=("opensans",15))
+                icon.place(x=120,y=80)
+                
 
 
             def light_mode():
@@ -677,7 +698,7 @@ class Widgets(ctk.CTkFrame):
 
             dropdown_3 = CustomDropdownMenu(widget=button_3)
             dropdown_3.add_option(option="Run Python Script",
-            command=self.run_python_file)
+            command=lambda: self.run_python_file(master))
 
             dropdown_4 = CustomDropdownMenu(widget=button_4)
 
