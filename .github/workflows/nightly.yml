@@ -1,0 +1,38 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Täglich um Mitternacht (UTC)
+  workflow_dispatch: # Manuelles Starten erlaubt
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Deine gewünschte Python-Version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Tests
+        run: |
+          if [ -f tests/test_basic.py ]; then pytest tests/; else echo "No tests found."; fi
+
+      - name: Build project (optional)
+        run: |
+          python setup.py sdist bdist_wheel || echo "No setup.py found. Skipping build."
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-build
+          path: dist/ # Das Standard-Output für Python-Projekte
