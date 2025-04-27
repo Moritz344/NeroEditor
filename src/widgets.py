@@ -17,7 +17,7 @@ from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting
 from write_to_json import *
 from ctkcomponents import *
-
+from markdown_editor import MarkdownViewerApp
 # TODO: Markdown unterstützung vorschau mit markdown und pywebview -> andere datei
 # TODO: Drag and Drop
 
@@ -168,9 +168,8 @@ class Widgets(ctk.CTkFrame):
 
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
-    def markdown_file(self):
-        if self.current_filetype == "Markdown":
-            print("There is an Markdown file.")
+    def markdown_file(self,window):
+            MarkdownViewerApp(window)
     def new_file(self,window):
             file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
@@ -309,7 +308,6 @@ class Widgets(ctk.CTkFrame):
         self.path_len = len(path[-1])
         self.update_icon()
         SyntaxHighlighting(self.textbox,self.current_filetype,self.fg_color,self.text_color,self.syntax,self.scrollbar)
-        self.markdown_file()
     def key_press(self,event):
        self.pressed_keys.add(event.keysym)
        self.check_combination()
@@ -678,8 +676,8 @@ class Widgets(ctk.CTkFrame):
             dropdown_1.add_option(option="Save ",command=lambda: self.save_file_only(master))
             dropdown_1.add_option(option="New File",command=lambda: self.new_file(master))
             dropdown_1.add_option(option="Save File As",command=self.ask_save_file)
-            dropdown_1.add_option(option="Open New File In Window",
-            command=self.open_new_file)
+            dropdown_1.add_option(option="Open New File In Window",command=self.open_new_file)
+            dropdown_1.add_option(option="Open Markdown Editor",command=lambda: self.markdown_file(master))
 
             # Recent File submenu
             self.submenu_1 = dropdown_1.add_submenu("Recent Files")
