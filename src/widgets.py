@@ -168,8 +168,9 @@ class Widgets(ctk.CTkFrame):
 
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
-    def markdown_file(self,window):
-            MarkdownViewerApp(window)
+    def markdown_file(self,):
+            root = ctk.CTkToplevel()
+            MarkdownViewerApp(root)
     def new_file(self,window):
             file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
@@ -677,7 +678,7 @@ class Widgets(ctk.CTkFrame):
             dropdown_1.add_option(option="New File",command=lambda: self.new_file(master))
             dropdown_1.add_option(option="Save File As",command=self.ask_save_file)
             dropdown_1.add_option(option="Open New File In Window",command=self.open_new_file)
-            dropdown_1.add_option(option="Open Markdown Editor",command=lambda: self.markdown_file(master))
+            dropdown_1.add_option(option="Open Markdown Editor",command=lambda: self.markdown_file())
 
             # Recent File submenu
             self.submenu_1 = dropdown_1.add_submenu("Recent Files")
