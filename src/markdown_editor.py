@@ -80,6 +80,6 @@ class MarkdownViewerApp(ctk.CTkFrame):
         self.html_frame.load_html(html)
 
 
-root = ctk.CTk()
-MarkdownViewerApp(root)
-root.mainloop()
+#root = ctk.CTk()
+#MarkdownViewerApp(root)
+#root.mainloop()

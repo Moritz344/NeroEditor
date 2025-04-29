@@ -17,7 +17,7 @@ from CTkScrollableDropdown import *
 from syntax import SyntaxHighlighting
 from write_to_json import *
 from ctkcomponents import *
-#from markdown_editor import MarkdownViewerApp
+from markdown_editor import MarkdownViewerApp
 # TODO: Markdown unterstützung vorschau mit markdown und pywebview -> andere datei
 # TODO: Drag and Drop
 
@@ -169,9 +169,9 @@ class Widgets(ctk.CTkFrame):
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
     def markdown_file(self,):
-            pass
-            #root = ctk.CTkToplevel()
-            #MarkdownViewerApp(root)
+            root = ctk.CTk()
+            MarkdownViewerApp(root)
+            root.mainloop()
     def new_file(self,window):
             file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
