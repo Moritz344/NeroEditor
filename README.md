@@ -19,7 +19,9 @@
 
 ![Screenshot_1](https://github.com/user-attachments/assets/8145b247-5424-434e-ad8a-ed2e7b7b69a4)
 
+
 </details>
+
 
 # Features
 - Basic Syntax Highlighting for Python
@@ -34,6 +36,10 @@
 - Ctrl+z(undo)
 - Ctrl+y(redo)
 - file info window
+
+
+## Built in Markdown Editor with Preview 🧙‍♂️
+![Screenshot_18](https://github.com/user-attachments/assets/98398e0e-a263-407d-9ade-63d385a95754)
 
 
 # Requirements
