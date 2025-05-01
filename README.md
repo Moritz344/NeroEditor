@@ -43,11 +43,7 @@
 
 
 # Requirements
-- Python 3.11
-- tkinter
-- customtkinter
-- pillow
-
+see requirements.txt
 
 
 # Usage
