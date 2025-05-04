@@ -62,6 +62,3 @@ python3 main.py
 
 # Author
 - Moritz344
-# Author
-- Moritz344
-
