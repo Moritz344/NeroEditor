@@ -18,8 +18,6 @@ from syntax import SyntaxHighlighting
 from write_to_json import *
 from ctkcomponents import *
 from markdown_editor import MarkdownViewerApp
-# TODO: Markdown unterstützung vorschau mit markdown und pywebview -> andere datei
-# TODO: Drag and Drop
 
 
 class Widgets(ctk.CTkFrame):

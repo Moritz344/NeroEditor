@@ -41,7 +41,7 @@ class App(ctk.CTk):
 
         self.mainloop()
 
-StartScreen() # wird auskommentiert für debug zwecken
+#StartScreen() # wird auskommentiert für debug zwecken
 App()
 
 
