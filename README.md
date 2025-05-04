@@ -60,21 +60,8 @@ python3 main.py
 
 ```
 
-
-⚠ Note: There is now an executable file you can run to use the app.
-
-
-
 # Author
 - Moritz344
-
-
-
-
-⚠ Note: There is now an executable file you can run to use the app.
-
-
-
 # Author
 - Moritz344
 
