@@ -167,7 +167,7 @@ class Widgets(ctk.CTkFrame):
         except Exception as e:
                print("AHHHHHHHHHHHHHHH",e)
     def markdown_file(self,):
-            root = ctk.CTk()
+            root = ctk.CTkToplevel()
             MarkdownViewerApp(root)
             root.mainloop()
     def new_file(self,window):
@@ -674,7 +674,7 @@ class Widgets(ctk.CTkFrame):
             dropdown_1 = CustomDropdownMenu(widget=button_1,hover_color="#32373b")
             dropdown_1.add_option(option="Open",command=lambda: self.open_file(master))
             dropdown_1.add_option(option="Save ",command=lambda: self.save_file_only(master))
-            dropdown_1.add_option(option="New File",command=lambda: self.new_file(master))
+            #dropdown_1.add_option(option="New File",command=lambda: self.new_file(master))
             dropdown_1.add_option(option="Save File As",command=self.ask_save_file)
             dropdown_1.add_option(option="Open New File In Window",command=self.open_new_file)
             dropdown_1.add_option(option="Open Markdown Editor",command=lambda: self.markdown_file())

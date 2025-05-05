@@ -13,7 +13,7 @@ class StartScreen(ctk.CTk):
         self.title(project_name)
         self.maxsize(800,600)
         self.minsize(800,600)
-        ctk.set_appearance_mode("system")
+        ctk.set_appearance_mode("dark")
         
         self.configure(cursor="@Normal.cur")
 

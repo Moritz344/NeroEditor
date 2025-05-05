@@ -3,3 +3,5 @@ tk
 pillow
 CTkSpinbox
 ctkcomponents
+markdown
+tkinterweb

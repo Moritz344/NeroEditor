@@ -1,14 +1,13 @@
 import markdown
 import customtkinter as ctk
-import tkinter as tk
 from tkinter import filedialog,simpledialog
+import tkinter as tk
 from settings import *
 from tkinterweb import HtmlFrame
 from CTkMenuBar import *
 from PIL import Image
 import os
 
-ctk.set_appearance_mode("dark")
 
 class MarkdownViewerApp(ctk.CTkFrame):
     def __init__(self, root):
@@ -17,13 +16,14 @@ class MarkdownViewerApp(ctk.CTkFrame):
         root.title("Markdown Editor")
         
 
+        ctk.set_appearance_mode("dark")
         self.menu = CTkMenuBar(root,)
         file_btn = self.menu.add_cascade("File")
 
         dropdown = CustomDropdownMenu(widget=file_btn)
         dropdown.add_option("Open",command=self.open_file)
         dropdown.add_option("Save",command=self.save_file)
-        dropdown.add_option("New File",command=self.new_file)
+        #dropdown.add_option("New File",command=self.new_file)
         dropdown.add_option("Exit",command=root.destroy)
 
         self.pressed_keys = set()
@@ -39,22 +39,22 @@ class MarkdownViewerApp(ctk.CTkFrame):
         self.topbar.pack(side="top",anchor="w")
 
 
-        bold_img = ctk.CTkImage(Image.open("assets/bold.png"),size=(30,30))
-        italic_img = ctk.CTkImage(Image.open("assets/italic.png"),size=(30,30))
-        headline_img = ctk.CTkImage(Image.open("assets/heading.png"),size=(30,30))
-        list_img = ctk.CTkImage(Image.open("assets/list.png"),size=(30,30))
+        self.bold_img = ctk.CTkImage(Image.open("assets/bold.png"),size=(30,30))
+        self.italic_img = ctk.CTkImage(Image.open("assets/italic.png"),size=(30,30))
+        self.headline_img = ctk.CTkImage(Image.open("assets/heading.png"),size=(30,30))
+        self.list_img = ctk.CTkImage(Image.open("assets/list.png"),size=(30,30))
 
 
-        bold_btn = ctk.CTkButton(self.topbar,width=10,image=bold_img,hover_color="#DEDEDE",text="",fg_color="transparent",command=self.bold_btn)
+        bold_btn = ctk.CTkButton(self.topbar,width=10,image=self.bold_img,hover_color="#DEDEDE",text="",fg_color="transparent",command=self.bold_btn)
         bold_btn.place(x=10,y=10)
 
-        kursiv_btn = ctk.CTkButton(self.topbar,width=10,image=italic_img, hover_color="#DEDEDE",text="", fg_color="transparent",command=self.kursiv_btn)
+        kursiv_btn = ctk.CTkButton(self.topbar,width=10,image=self.italic_img, hover_color="#DEDEDE",text="", fg_color="transparent",command=self.kursiv_btn)
         kursiv_btn.place(x=60,y=10)
 
-        list_btn = ctk.CTkButton(self.topbar,width=10,image=list_img,text="",  hover_color="#DEDEDE",fg_color="transparent",command=self.list_item)
+        list_btn = ctk.CTkButton(self.topbar,width=10,image=self.list_img,text="",  hover_color="#DEDEDE",fg_color="transparent",command=self.list_item)
         list_btn.place(x=110,y=10)
 
-        header_btn = ctk.CTkButton(self.topbar,width=10,image=headline_img,text="",  hover_color="#DEDEDE",fg_color="transparent",command=self.header_btn)
+        header_btn = ctk.CTkButton(self.topbar,width=10,image=self.headline_img,text="",  hover_color="#DEDEDE",fg_color="transparent",command=self.header_btn)
         header_btn.place(x=160,y=10)
 
 
@@ -141,17 +141,25 @@ class MarkdownViewerApp(ctk.CTkFrame):
         self.textbox_1.mark_set("insert",f"{pos} +2c ")
 
     def new_file(self,):
-        file_path = filedialog.asksaveasfilename(title="Create File",
-        filetypes=[("Markdown","*.md"),("Text","*.txt")])
         
-        if file_path:
-          try:
-              content = self.textbox_1.get(1.0,tk.END)
-              with open(file_path,"w",encoding="utf-8") as file:
-                  file.write(content)
-          except Exception as e:
-              print(e)
+        path = simpledialog.askstring("Create File:","Please give me the full path.")
+        file_directory = os.path.dirname(path)
+        file_name = os.path.basename(path)
 
+        print(file_directory,file_name)
+
+        file_path = os.path.join(file_directory, file_name)
+        try:
+             content = self.textbox_1.get(1.0, tk.END)
+             with open(file_path, "w", encoding="utf-8") as file:
+                    print("datei erstellt")
+                    file.write(content)
+        except Exception as e:
+            print(e)
+
+
+        
+        
     def open_file(self,):
         file_path = filedialog.askopenfilename(title="Open Markdown File",
         filetypes=[("Markdown ","*.md",),("Show all ","*.*")]
@@ -234,6 +242,6 @@ class MarkdownViewerApp(ctk.CTkFrame):
         self.html_frame.load_html(html_output)
 
 
-root = ctk.CTk()
-MarkdownViewerApp(root)
-root.mainloop()
+#root = ctk.CTk()
+#MarkdownViewerApp(root)
+#root.mainloop()
