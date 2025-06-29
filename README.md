@@ -39,7 +39,7 @@
 
 
 ## Built in Markdown Editor with Preview 🧙‍♂️
-![Screenshot_18](https://github.com/user-attachments/assets/98398e0e-a263-407d-9ade-63d385a95754)
+![markdown](https://github.com/user-attachments/assets/4bf9e408-dcfc-4927-9f50-b7866a7f0fa9)
 
 
 # Requirements
